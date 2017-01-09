@@ -1,7 +1,7 @@
-##### overview
+### about
 
-Minimalist [passenger](https://www.phusionpassenger.com)-compatible [django](https://www.djangoproject.com) project.
+Under construction.
 
-Part of [new-project TODO list](https://gist.github.com/birkin/04a0a124d49be02e3d58).
+This code will handle the processing of inscriptions for the [IIP website](https://library.brown.edu/cds/projects/iip/search/).
 
 ---
