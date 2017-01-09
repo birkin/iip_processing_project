@@ -15,7 +15,7 @@ Prepares application environment.
 Variables assume project setup like:
 stuff
     iip_processing_project
-        app_x
+        iip_processing_app
         config
     env_min_djng
 """
