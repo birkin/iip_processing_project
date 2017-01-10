@@ -10,7 +10,8 @@ def validate_access( basic_auth_info, received_ip ):
     """ Validates http-basic-auth.
         Called by different views. """
     return_val = False
-    if basic_auth_info is note None and ip is not None:
+    if basic_auth_info is not None and ip is not None:
+        log.debug( 'here' )
         if auth_info.startswith('Basic '):
             decoded_basic_info = basic_auth_info.lstrip('Basic ').decode('base64')
             ( received_username, received_password ) = decoded_basic_info.rsplit( ':', 1 )   # cool; 'rsplit-1' solves problem if 'username' contains one or more colons.
