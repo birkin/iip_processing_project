@@ -21,7 +21,8 @@ def info( request ):
 def process_single( request, inscription_id ):
     """ Triggers, after instruction, processing of given iscription. """
     log.info( 'starting; inscription_id, `{}`'.format(inscription_id) )
-    if validator.validate_access( a, b ) == False:
+    ( basic_auth_info, ip ) = ( request.META.get('HTTP_AUTHORIZATION', None), request.META.get('REMOTE_ADDR', None) )
+    if validator.validate_access( basic_auth_info, ip ) == False:
         log.info( 'not authorized, returning Forbidden' )
         return HttpResponseForbidden( '403 / Forbidden' )
     if inscription_id == u'INSCRIPTION_ID':

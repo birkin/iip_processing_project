@@ -8,6 +8,7 @@ from iip_processing_app import views
 
 admin.autodiscover()
 
+
 urlpatterns = [
 
     # url( r'^admin/', include(admin.site.urls) ),

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import os
+import json, os
 
 
-FOO = 'BAR'
-
-FOO2 = os.environ['FOO2']
+LEGIT_ACCESSORS_DCT = json.loads( os.environ['IIP_PRC__LEGIT_ACCESSORS'] )
