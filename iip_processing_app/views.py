@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, render
 log = logging.getLogger(__name__)
 
 
-def hi( request ):
+def info( request ):
     """ Returns simplest response. """
     now = datetime.datetime.now()
     log.debug( 'now, ```{}```'.format(now) )
@@ -19,7 +19,16 @@ def hi( request ):
 
 
 def process_single( request, inscription_id ):
-    return HttpResponse( 'process_single coming' )
+    """ Triggers, after instruction, processing of given iscription. """
+    log.info( 'starting; inscription_id, `{}`'.format(inscription_id) )
+    if validator.validate_access( a, b ) == False:
+        log.info( 'not authorized, returning Forbidden' )
+        return HttpResponseForbidden( '403 / Forbidden' )
+    if inscription_id == u'INSCRIPTION_ID':
+        return HttpResponse( u'In url above, replace `INSCRIPTION_ID` with id to process, eg `ahma0002`. This will not change proofreading status.' )
+    else:
+        q.enqueue_call( func=u'iip_processing_app.lib.processor.run_process_single_file', kwargs = {u'inscription_id': inscription_id} )
+        return HttpResponse( u'Started processing inscription-id, `{}`.'.format(inscription_id) )
 
 
 def process_new( request ):

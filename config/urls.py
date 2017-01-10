@@ -12,7 +12,7 @@ urlpatterns = [
 
     # url( r'^admin/', include(admin.site.urls) ),
 
-    url( r'^info/$',  views.hi, name='info_url' ),
+    url( r'^info/$',  views.info, name='info_url' ),
 
     url( r'^process/single/(?P<inscription_id>.*)/$', views.process_single, name=u'process_single_url' ),
     url( r'^process/new/$', views.process_new, name=u'process_new_url' ),
