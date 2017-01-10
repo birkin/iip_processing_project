@@ -14,4 +14,5 @@ log = logging.getLogger(__name__)
 def hi( request ):
     """ Returns simplest response. """
     now = datetime.datetime.now()
+    log.debug( 'now, ```{}```'.format(now) )
     return HttpResponse( '<p>hi</p> <p>( %s )</p>' % now )
