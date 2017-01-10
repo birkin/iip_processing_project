@@ -16,3 +16,23 @@ def hi( request ):
     now = datetime.datetime.now()
     log.debug( 'now, ```{}```'.format(now) )
     return HttpResponse( '<p>hi</p> <p>( %s )</p>' % now )
+
+
+def process_single( request, inscription_id ):
+    return HttpResponse( 'process_single coming' )
+
+
+def process_new( request ):
+    return HttpResponse( 'process_new coming' )
+
+
+def process_all( request ):
+    return HttpResponse( 'process_all coming' )
+
+
+def process_all_confirm( request ):
+    return HttpResponse( 'process_all_confirm coming' )
+
+
+def process_orphans( request ):
+    return HttpResponse( 'process_orphans coming' )

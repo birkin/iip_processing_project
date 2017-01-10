@@ -10,13 +10,15 @@ admin.autodiscover()
 
 urlpatterns = [
 
-    url( r'^admin/', include(admin.site.urls) ),  # eg host/project_x/admin/
-
-    # url( r'^', include('iip_processing_app.urls_app', namespace='foo') ),  # eg host/project_x/anything/
+    # url( r'^admin/', include(admin.site.urls) ),
 
     url( r'^info/$',  views.hi, name='info_url' ),
 
-    # url( r'^$',  RedirectView.as_view(pattern_name='foo:info_url') ),
+    url( r'^process/single/(?P<inscription_id>.*)/$', views.process_single, name=u'process_single_url' ),
+    url( r'^process/new/$', views.process_new, name=u'process_new_url' ),
+    url( r'^process/all/$', views.process_all, name=u'process_all_url' ),
+    url( r'^process/delete_orphans/$', views.process_orphans, name=u'process_orphans_url' ),
+
     url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
 
     ]
