@@ -19,6 +19,11 @@ def info( request ):
     return HttpResponse( '<p>hi</p> <p>( %s )</p>' % now )
 
 
+def git_watcher( request ):
+    """ Handles git web-hook notification. """
+    return HttpResponse( 'ok' )
+
+
 def process_single( request, inscription_id ):
     """ Triggers, after instruction, processing of given iscription. """
     log.info( 'starting; inscription_id, `{}`'.format(inscription_id) )

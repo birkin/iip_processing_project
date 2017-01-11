@@ -15,6 +15,8 @@ urlpatterns = [
 
     url( r'^info/$',  views.info, name='info_url' ),
 
+    url( r'^git_watcher/$',  views.git_watcher, name='git_watcher_url' ),
+
     url( r'^process/single/(?P<inscription_id>.*)/$', views.process_single, name=u'process_single_url' ),
     url( r'^process/new/$', views.process_new, name=u'process_new_url' ),
     url( r'^process/all/$', views.process_all, name=u'process_all_url' ),
