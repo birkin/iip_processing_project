@@ -25,7 +25,11 @@ def git_watcher( request ):
     data_dct = gh_helper.parse_github_post( request.x )
     gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
     files_to_process = gh_helper.prep_files_to_process( data_dct )
-    return HttpResponse( 'under construction' )
+    q.enqueue_call (
+        func='iip_processing_app.lib.processor.run_call_git_pull',
+        kwargs = {'files_to_process': files_to_process}
+        )
+    return HttpResponse( 'received' )
 
 
 def process_single( request, inscription_id ):
