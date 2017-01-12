@@ -7,7 +7,7 @@ from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from iip_processing_app.lib import validator
+from iip_processing_app.lib import gitwatcher_helper, validator
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ def info( request ):
 
 def git_watcher( request ):
     """ Handles git web-hook notification. """
+    github_helper.log_github_post( request )
     return HttpResponse( 'ok' )
 
 
