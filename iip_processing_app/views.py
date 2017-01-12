@@ -7,7 +7,7 @@ from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from iip_processing_app.lib import gitwatcher_helper, validator
+from iip_processing_app.lib import github_helper, validator
 
 log = logging.getLogger(__name__)
 
@@ -21,8 +21,10 @@ def info( request ):
 
 def git_watcher( request ):
     """ Handles git web-hook notification. """
-    github_helper.log_github_post( request )
-    return HttpResponse( 'ok' )
+    gh_helper = github_helper.GHHelper()
+    data_dct = gh_helper.parse_github_post( request.x )
+    gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
+    return HttpResponse( 'under construction' )
 
 
 def process_single( request, inscription_id ):
