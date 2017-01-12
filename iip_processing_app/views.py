@@ -32,30 +32,8 @@ def git_watcher( request ):
     return HttpResponse( 'received' )
 
 
-def process_single( request, inscription_id ):
-    """ Triggers, after instruction, processing of given iscription. """
-    log.info( 'starting; inscription_id, `{}`'.format(inscription_id) )
-    ( basic_auth_info, ip ) = ( request.META.get('HTTP_AUTHORIZATION', None), request.META.get('REMOTE_ADDR', None) )
-    if validator.validate_access( basic_auth_info, ip ) == False:
-        log.info( 'not authorized, returning Forbidden' )
-        return HttpResponseForbidden( '403 / Forbidden' )
-    if inscription_id == u'INSCRIPTION_ID':
-        return HttpResponse( u'In url above, replace `INSCRIPTION_ID` with id to process, eg `ahma0002`. This will not change proofreading status.' )
-    else:
-        q.enqueue_call( func=u'iip_processing_app.lib.processor.run_process_single_file', kwargs = {u'inscription_id': inscription_id} )
-        return HttpResponse( u'Started processing inscription-id, `{}`.'.format(inscription_id) )
-
-
-def process_new( request ):
-    return HttpResponse( 'process_new coming' )
-
-
 def process_all( request ):
     return HttpResponse( 'process_all coming' )
-
-
-def process_all_confirm( request ):
-    return HttpResponse( 'process_all_confirm coming' )
 
 
 def process_orphans( request ):
