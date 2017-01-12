@@ -33,3 +33,27 @@ class GHHelper( object ):
             payload = data_dct['github_json']
             r = requests.post( self.DEV_URL, data=payload, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
         return
+
+    def prep_files_to_process( self, github_json ):
+        """ Prepares the data-dict to be sent to the first rq job. """
+        files_to_process = { u'files_updated': [], u'files_removed': [], u'timestamp': unicode(datetime.datetime.now()) }
+        if github_json:
+            commit_info = json.loads( github_json )
+            ( added, modified, removed ) = self._examine_commits( commit_info )
+            files_to_process[u'files_updated'] = added
+            files_to_process[u'files_updated'].extend( modified )  # solrization same for added or modified
+            files_to_process[u'files_removed'] = removed
+        log.debug( 'files_to_process, ```{}```'.format(pprint.pformat(files_to_process)) )
+        return files_to_process
+
+    def _examine_commits( self, commit_info ):
+        """ Extracts and returns file-paths for the different kinds of commits.
+            Called by prep_files_to_process(). """
+        added = []
+        modified = []
+        removed = []
+        for commit in commit_info[u'commits']:
+            added.extend( commit[u'added'] )
+            modified.extend( commit[u'modified'] )
+            removed.extend( commit[u'removed'] )
+        return ( added, modified, removed )

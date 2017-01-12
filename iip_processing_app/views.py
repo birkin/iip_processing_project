@@ -24,6 +24,7 @@ def git_watcher( request ):
     gh_helper = github_helper.GHHelper()
     data_dct = gh_helper.parse_github_post( request.x )
     gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
+    files_to_process = gh_helper.prep_files_to_process( data_dct )
     return HttpResponse( 'under construction' )
 
 
