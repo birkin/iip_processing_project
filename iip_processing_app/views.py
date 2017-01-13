@@ -21,6 +21,7 @@ def info( request ):
 
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
+    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
     gh_helper = github_helper.GHHelper()
     data_dct = gh_helper.parse_github_post( request.x )
     gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
