@@ -19,8 +19,8 @@ def info( request ):
     return HttpResponse( '<p>hi</p> <p>( %s )</p>' % now )
 
 
-def git_watcher( request ):
-    """ Handles git web-hook notification. """
+def gh_inscription_watcher( request ):
+    """ Handles github inscriptions web-hook notification. """
     gh_helper = github_helper.GHHelper()
     data_dct = gh_helper.parse_github_post( request.x )
     gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
