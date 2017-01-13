@@ -42,6 +42,6 @@ class HBAuthParserTest( TestCase ):
     def test_legit_info(self):
         """ Checks parsing of username and password. """
         self.assertEqual(
-            { 'username': self.hbauth_good_username, 'password': self.hbauth_good_password },
+            { 'received_username': self.hbauth_good_username, 'received_password': self.hbauth_good_password },
             gh_helper.parse_http_basic_auth( self.test_hbauth_header )
             )

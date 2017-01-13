@@ -8,9 +8,11 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
-from iip_processing_app.lib import github_helper, validator
+from iip_processing_app.lib.github_helper import GHHelper
+
 
 log = logging.getLogger(__name__)
+github_helper = GHHelper()
 
 
 def info( request ):
@@ -23,18 +25,14 @@ def info( request ):
 @csrf_exempt
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
-    if 'HTTP_AUTHORIZATION' in request.META:
-        auth_full = request.META['HTTP_AUTHORIZATION'].decode( 'utf-8' )
-        auth = auth_full.split()
-        if len(auth) == 2:
-            if auth[0].lower() == 'basic':
-                uname, passwd = base64.b64decode(auth[1]).split(':')
-    return HttpResponse( 'received' )
-
-
     log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
-    gh_helper = github_helper.GHHelper()
-    data_dct = gh_helper.parse_github_post( request.x )
+    if 'HTTP_AUTHORIZATION' in request.META:
+        received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
+        if github_helper.validate_credentials( received_username_password_dct ):
+            return HttpResponse( 'ok' )
+        else:
+            return HttpResponseForbidden
+    data_dct = github_helper.parse_github_post( request.x )
     gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
     files_to_process = gh_helper.prep_files_to_process( data_dct )
     q.enqueue_call (

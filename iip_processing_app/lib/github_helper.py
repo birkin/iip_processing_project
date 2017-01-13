@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 import base64, logging, os, pprint
 
+
 log = logging.getLogger(__name__)
 
 
@@ -10,8 +11,8 @@ class GHHelper( object ):
     """ Contains support functions for views.git_watcher() """
 
     def __init__( self ):
-        self.AUTH_PASSWORD = unicode( os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'] )
         self.AUTH_USERNAME = unicode( os.environ['IIP_PRC__BASIC_AUTH_USERNAME'] )
+        self.AUTH_PASSWORD = unicode( os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'] )
         self.DEV_URL = unicode( os.environ['IIP_PRC__DEV_URL'] )
         self.PRODUCTION_HOSTNAME = unicode( os.environ['IIP_PRC__PRODUCTION_HOSTNAME'] )
 
@@ -32,9 +33,16 @@ class GHHelper( object ):
         auth = basic_auth_header_text.split()
         if len(auth) == 2:
             if auth[0].lower() == 'basic':
-                uname, passwd = base64.b64decode(auth[1]).split(':')
-                return_dct = { 'username': uname, 'password': passwd }
+                received_username, received_password = base64.b64decode(auth[1]).split(':')
+                return_dct = { 'received_username': received_username, 'received_password': received_password }
         return return_dct
+
+    def validate_credentials( self, received_auth_dct ):
+        """ Checks credentials. """
+        return_val = False
+        if received_auth_dct['username'] = self.AUTH_USERNAME and received_auth_dct['password'] = self.AUTH_PASSWORD:
+            return_val = True
+        return return_val
 
     def trigger_dev_if_production( self, data_dct ):
         """ Sends github `data` to dev-server (which github can't hit) if this is the production-server. """
