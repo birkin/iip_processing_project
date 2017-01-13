@@ -34,10 +34,14 @@ class RootUrlTest( TestCase ):
 class HBAuthParserTest( TestCase ):
     """ Checks parsing of http-basic-auth incoming info. """
 
+    def setUp(self):
+        self.test_hbauth_header = os.environ['IIP_PRC__TEST_HTTP_BASIC_AUTH_HEADER'].decode( 'utf-8' )
+        self.hbauth_good_username = os.environ['IIP_PRC__BASIC_AUTH_USERNAME'].decode( 'utf-8' )
+        self.hbauth_good_password = os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'].decode( 'utf-8' )
+
     def test_legit_info(self):
         """ Checks parsing of username and password. """
-        hbauth_header = os.environ['IIP_PRC__TEST_HTTP_BASIC_AUTH_HEADER'].decode( 'utf-8' )
         self.assertEqual(
-            {'foo': 'bart'},
-            gh_helper.parse_http_basic_auth( hbauth_header )
+            { 'username': self.hbauth_good_username, 'password': self.hbauth_good_password },
+            gh_helper.parse_http_basic_auth( self.test_hbauth_header )
             )
