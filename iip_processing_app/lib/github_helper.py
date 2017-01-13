@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import logging, os, pprint
+import base64, logging, os, pprint
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +25,16 @@ class GHHelper( object ):
             }
         log.debug( 'data_dct, ```{}```'.format(pprint.pformat(data_dct)) )
         return data_dct
+
+    def parse_http_basic_auth( self, basic_auth_header_text ):
+        """ Returns parsed username and password. """
+        return_dct = { 'username': None, 'password': None }
+        auth = basic_auth_header_text.split()
+        if len(auth) == 2:
+            if auth[0].lower() == 'basic':
+                uname, passwd = base64.b64decode(auth[1]).split(':')
+                return_dct = { 'username': uname, 'password': passwd }
+        return return_dct
 
     def trigger_dev_if_production( self, data_dct ):
         """ Sends github `data` to dev-server (which github can't hit) if this is the production-server. """

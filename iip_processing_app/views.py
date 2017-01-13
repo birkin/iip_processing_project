@@ -23,6 +23,15 @@ def info( request ):
 @csrf_exempt
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
+    if 'HTTP_AUTHORIZATION' in request.META:
+        auth_full = request.META['HTTP_AUTHORIZATION'].decode( 'utf-8' )
+        auth = auth_full.split()
+        if len(auth) == 2:
+            if auth[0].lower() == 'basic':
+                uname, passwd = base64.b64decode(auth[1]).split(':')
+    return HttpResponse( 'received' )
+
+
     log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
     gh_helper = github_helper.GHHelper()
     data_dct = gh_helper.parse_github_post( request.x )
