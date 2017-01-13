@@ -7,6 +7,7 @@ from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 from iip_processing_app.lib import github_helper, validator
 
 log = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ def info( request ):
     return HttpResponse( '<p>hi</p> <p>( %s )</p>' % now )
 
 
+@csrf_exempt
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
     log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
