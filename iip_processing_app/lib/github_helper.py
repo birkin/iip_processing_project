@@ -37,6 +37,7 @@ class GHHelper( object ):
             if auth[0].lower() == 'basic':
                 received_username, received_password = base64.b64decode(auth[1]).split(':')
                 return_dct = { 'received_username': received_username, 'received_password': received_password }
+        log.debug( 'return_dct, ```{}```'.format(return_dct) )
         return return_dct
 
     def validate_credentials( self, received_auth_dct ):

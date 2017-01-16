@@ -29,6 +29,7 @@ def gh_inscription_watcher( request ):
     if 'HTTP_AUTHORIZATION' in request.META:
         log.debug( 'HTTP_AUTHORIZATION detected' )
         received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
+        log.debug( 'user-pass dct obtained' )
         if github_helper.validate_credentials( received_username_password_dct ):
             log.debug( 'returning "ok / basic-auth"' )
             return HttpResponse( 'ok / basic-auth' )
