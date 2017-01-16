@@ -43,8 +43,9 @@ class GHHelper( object ):
     def validate_credentials( self, received_auth_dct ):
         """ Checks credentials. """
         return_val = False
-        if received_auth_dct['username'] == self.AUTH_USERNAME and received_auth_dct['password'] == self.AUTH_PASSWORD:
+        if received_auth_dct['received_username'] == self.AUTH_USERNAME and received_auth_dct['received_password'] == self.AUTH_PASSWORD:
             return_val = True
+        log.debug( 'return_val, ```{}```'.format(return_val) )
         return return_val
 
     def trigger_dev_if_production( self, data_dct ):
