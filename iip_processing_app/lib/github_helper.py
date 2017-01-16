@@ -32,6 +32,7 @@ class GHHelper( object ):
         log.debug( 'starting parse_http_basic_auth()' )
         return_dct = { 'username': None, 'password': None }
         auth = basic_auth_header_text.split()
+        log.debug( 'auth, ```{}```'.format(auth) )
         if len(auth) == 2:
             if auth[0].lower() == 'basic':
                 received_username, received_password = base64.b64decode(auth[1]).split(':')
