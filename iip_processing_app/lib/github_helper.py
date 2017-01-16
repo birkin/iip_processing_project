@@ -40,7 +40,7 @@ class GHHelper( object ):
     def validate_credentials( self, received_auth_dct ):
         """ Checks credentials. """
         return_val = False
-        if received_auth_dct['username'] = self.AUTH_USERNAME and received_auth_dct['password'] = self.AUTH_PASSWORD:
+        if received_auth_dct['username'] == self.AUTH_USERNAME and received_auth_dct['password'] == self.AUTH_PASSWORD:
             return_val = True
         return return_val
 
