@@ -26,6 +26,11 @@ def info( request ):
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
     log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
+
+    log.debug( 'request.scheme, ```{}```'.format(pprint.pformat(request.scheme)) )
+
+    log.debug( 'request.body, ```{}```'.format(pprint.pformat(request.body)) )
+
     if 'HTTP_AUTHORIZATION' in request.META:
         log.debug( 'HTTP_AUTHORIZATION detected' )
         received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
