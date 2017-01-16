@@ -29,17 +29,22 @@ def gh_inscription_watcher( request ):
     if 'HTTP_AUTHORIZATION' in request.META:
         received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
         if github_helper.validate_credentials( received_username_password_dct ):
-            return HttpResponse( 'ok' )
+            log.debug( 'returning "ok / basic-auth"' )
+            return HttpResponse( 'ok / basic-auth' )
         else:
+            log.debug( 'returning "forbidden"' )
             return HttpResponseForbidden
-    data_dct = github_helper.parse_github_post( request.x )
-    gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
-    files_to_process = gh_helper.prep_files_to_process( data_dct )
-    q.enqueue_call (
-        func='iip_processing_app.lib.processor.run_call_git_pull',
-        kwargs = {'files_to_process': files_to_process}
-        )
-    return HttpResponse( 'received' )
+    else:
+        log.debug( 'returning "regular ok"' )
+        return HttpResponse( 'ok / regular' )
+    # data_dct = github_helper.parse_github_post( request.x )
+    # gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
+    # files_to_process = gh_helper.prep_files_to_process( data_dct )
+    # q.enqueue_call (
+    #     func='iip_processing_app.lib.processor.run_call_git_pull',
+    #     kwargs = {'files_to_process': files_to_process}
+    #     )
+    # return HttpResponse( 'received' )
 
 
 def process_all( request ):
