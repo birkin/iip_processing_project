@@ -29,6 +29,7 @@ class GHHelper( object ):
 
     def parse_http_basic_auth( self, basic_auth_header_text ):
         """ Returns parsed username and password. """
+        log.debug( 'starting parse_http_basic_auth()' )
         return_dct = { 'username': None, 'password': None }
         auth = basic_auth_header_text.split()
         if len(auth) == 2:
