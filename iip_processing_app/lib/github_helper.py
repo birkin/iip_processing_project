@@ -50,23 +50,37 @@ class GHHelper( object ):
         """ Enqueues first of a series of processing jobs. """
         log.debug( 'request_body, ```{}```'.format(request_body) )
         try:
-            json.loads( request_body )
+            data_dct = json.loads( request_body )
+            to_process_dct = self.prep_files_to_process( data_dct['commits'] )
         except Exception as e:
             log.debug( 'exception, ```{}```'.format(unicode(e)) )
         return
 
+    def prep_files_to_process( self, commits_dct ):
+        """ Prepares the data-dict to be sent to the first rq job.
+            Called by handle_inscription_update() """
+        files_to_process = { u'files_updated': [], u'files_removed': [], u'timestamp': unicode(datetime.datetime.now()) }
+        ( added, modified, removed ) = self._examine_commits( commits_dct )
+        files_to_process[u'files_updated'] = added
+        files_to_process[u'files_updated'].extend( modified )  # solrization same for added or modified
+        files_to_process[u'files_removed'] = removed
+        log.debug( 'files_to_process, ```{}```'.format(pprint.pformat(files_to_process)) )
+        return files_to_process
+
+    def _examine_commits( self, commits_dct ):
+        """ Extracts and returns file-paths for the different kinds of commits.
+            Called by prep_files_to_process(). """
+        added = []
+        modified = []
+        removed = []
+        for commit in commit_info[u'commits']:
+            added.extend( commit[u'added'] )
+            modified.extend( commit[u'modified'] )
+            removed.extend( commit[u'removed'] )
+        return ( added, modified, removed )
+
     ## end class GHHelper()
 
-    # def log_github_post( self, request_data ):
-    #     """ Logs data posted from github. """
-    #     data_dct = {
-    #         'datetime': datetime.datetime.now(),
-    #         'host': 'foo',
-    #         'github_json': 'bar'
-    #         # TODO
-    #         }
-    #     log.debug( 'data_dct, ```{}```'.format(pprint.pformat(data_dct)) )
-    #     return data_dct
 
     # def trigger_dev_if_production( self, data_dct ):
     #     """ Sends github `data` to dev-server (which github can't hit) if this is the production-server. """
