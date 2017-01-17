@@ -30,7 +30,7 @@ def gh_inscription_watcher( request ):
     if 'HTTP_AUTHORIZATION' in request.META:
         received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
         if github_helper.validate_credentials( received_username_password_dct ):
-            github_helper.handle_inscription_update( request.body )
+            github_helper.handle_inscription_update( request.body, request.META.get('HTTP_HOST', None) )
             resp = HttpResponse( '200 / OK' )
     else:
         resp = github_helper.make_unauthenticated_response()

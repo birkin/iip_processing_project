@@ -44,12 +44,12 @@ class GHHelper( object ):
         resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
         return resp
 
-    def handle_inscription_update( self, request_body ):
+    def handle_inscription_update( self, request_body, host ):
         """ Enqueues first of a series of processing jobs. """
         log.debug( 'request_body, ```{}```'.format(request_body) )
         data_dct = json.loads( request_body )
         to_process_dct = self.prep_files_to_process( data_dct['commits'] )
-        self.trigger_dev_if_production( request_body )
+        self.trigger_dev_if_production( request_body, host )
         return
 
     def prep_files_to_process( self, commits_lst ):
@@ -75,17 +75,17 @@ class GHHelper( object ):
             removed.extend( commit[u'removed'] )
         return ( added, modified, removed )
 
-    def trigger_dev_if_production( self, request_body ):
+    def trigger_dev_if_production( self, request_body, host ):
         """ Sends github `data` to dev-server (which github can't hit) if this is the production-server.
             Called by handle_inscription_update() """
         log.debug( 'starting' )
         message = 'not production'
-        if data_dct['host'] == self.PRODUCTION_HOSTNAME:
+        if host == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
             try:
                 r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
             except Exception as e:
-                log.error( 'exception, ```{}```'.format(unicode(e)) )
+                log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
             finally:
                 message = 'status_code, `{}`'.format( r.status_code )
         log.debug( 'result, ```{}```'.format(message) )
