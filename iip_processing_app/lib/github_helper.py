@@ -81,8 +81,12 @@ class GHHelper( object ):
         message = 'not production'
         if data_dct['host'] == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
-            r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
-            message = 'status_code, `{}`'.format( request.status_code )
+            try:
+                r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
+            except Exeption as e:
+                log.error( 'exception, ```{}```'.format(unicode(e)) )
+            finally:
+                message = 'status_code, `{}`'.format( r.status_code )
         log.debug( 'result, ```{}```'.format(message) )
         return
 
