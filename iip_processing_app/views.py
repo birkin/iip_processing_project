@@ -25,33 +25,17 @@ def info( request ):
 @csrf_exempt
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
-    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
-
-    log.debug( 'request.scheme, ```{}```'.format(pprint.pformat(request.scheme)) )
-
     log.debug( 'request.body, ```{}```'.format(pprint.pformat(request.body)) )
-
+    resp = HttpResponseForbidden( '403 / Forbidden' )  # will be returned if incorrect basic-auth credentials are submitted
     if 'HTTP_AUTHORIZATION' in request.META:
-        log.debug( 'HTTP_AUTHORIZATION detected' )
         received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
-        log.debug( 'user-pass dct obtained' )
         if github_helper.validate_credentials( received_username_password_dct ):
-            log.debug( 'returning "ok / basic-auth"' )
-            return HttpResponse( 'ok / basic-auth' )
-        else:
-            log.debug( 'returning "forbidden"' )
-            return HttpResponseForbidden
+            github_helper.handle_inscription_update( request.body )
+            resp = HttpResponse( '200 / OK' )
     else:
-        log.debug( 'returning "regular ok"' )
-        return HttpResponse( 'ok / regular' )
-    # data_dct = github_helper.parse_github_post( request.x )
-    # gh_helper.trigger_dev_if_production( data_dct )  # github can only hit production; we want dev updated, too
-    # files_to_process = gh_helper.prep_files_to_process( data_dct )
-    # q.enqueue_call (
-    #     func='iip_processing_app.lib.processor.run_call_git_pull',
-    #     kwargs = {'files_to_process': files_to_process}
-    #     )
-    # return HttpResponse( 'received' )
+        resp = github_helper.make_unauthenticated_response()
+    log.debug( 'response status code, `{}`'.format(resp.status_code) )
+    return resp
 
 
 def process_all( request ):
