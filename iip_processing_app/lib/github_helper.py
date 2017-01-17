@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import base64, datetime, json, logging, os, pprint
+import requests
 from django.http import HttpResponse
 
 
@@ -83,7 +84,7 @@ class GHHelper( object ):
         if host == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
             try:
-                r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
+                r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD), timeout=10 )
             except Exception as e:
                 log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
             finally:
