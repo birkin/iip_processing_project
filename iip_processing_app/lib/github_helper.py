@@ -80,16 +80,14 @@ class GHHelper( object ):
         """ Sends github `data` to dev-server (which github can't hit) if this is the production-server.
             Called by handle_inscription_update() """
         log.debug( 'starting' )
-        message = 'not production'
         if host == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
             try:
                 r = requests.post( self.DEV_URL, data=request_body, auth=(self.AUTH_USERNAME, self.AUTH_PASSWORD), timeout=10 )
+                log.debug( 'status_code, `{}`'.format(r.status_code) )
             except Exception as e:
                 log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
-            finally:
-                message = 'status_code, `{}`'.format( r.status_code )
-        log.debug( 'result, ```{}```'.format(message) )
+        log.debug( 'leaving' )
         return
 
     ## end class GHHelper()
