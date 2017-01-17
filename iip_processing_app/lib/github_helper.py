@@ -49,6 +49,7 @@ class GHHelper( object ):
         log.debug( 'request_body, ```{}```'.format(request_body) )
         data_dct = json.loads( request_body )
         to_process_dct = self.prep_files_to_process( data_dct['commits'] )
+        self.trigger_dev_if_production( request_body )
         return
 
     def prep_files_to_process( self, commits_lst ):
@@ -74,14 +75,18 @@ class GHHelper( object ):
             removed.extend( commit[u'removed'] )
         return ( added, modified, removed )
 
+    def trigger_dev_if_production( self, request_body ):
+        """ Sends github `data` to dev-server (which github can't hit) if this is the production-server.
+            Called by handle_inscription_update() """
+        message = 'not production'
+        if data_dct['host'] == self.PRODUCTION_HOSTNAME:
+            log.debug( 'gonna hit dev' )
+            r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
+            message = 'status_code, `{}`'.format( request.status_code )
+        log.debug( 'result, ```{}```'.format(message) )
+        return
+
     ## end class GHHelper()
 
 
-    # def trigger_dev_if_production( self, data_dct ):
-    #     """ Sends github `data` to dev-server (which github can't hit) if this is the production-server. """
-    #     if data_dct['host'] == self.PRODUCTION_HOSTNAME:
-    #         log.debug( 'gonna hit dev, too' )
-    #         payload = data_dct['github_json']
-    #         r = requests.post( self.DEV_URL, data=payload, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
-    #     return
 
