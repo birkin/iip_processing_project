@@ -73,7 +73,7 @@ class GHHelper( object ):
         added = []
         modified = []
         removed = []
-        for commit in commit_info[u'commits']:
+        for commit in commits_dct[u'commits']:
             added.extend( commit[u'added'] )
             modified.extend( commit[u'modified'] )
             removed.extend( commit[u'removed'] )
