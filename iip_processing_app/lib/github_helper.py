@@ -22,12 +22,10 @@ class GHHelper( object ):
         log.debug( 'starting parse_http_basic_auth()' )
         return_dct = { 'username': None, 'password': None }
         auth = basic_auth_header_text.split()
-        log.debug( 'auth, ```{}```'.format(auth) )
         if len(auth) == 2:
             if auth[0].lower() == 'basic':
                 received_username, received_password = base64.b64decode(auth[1]).split(':')
                 return_dct = { 'received_username': received_username, 'received_password': received_password }
-        log.debug( 'return_dct, ```{}```'.format(return_dct) )
         return return_dct
 
     def validate_credentials( self, received_auth_dct ):
@@ -87,26 +85,3 @@ class GHHelper( object ):
     #         r = requests.post( self.DEV_URL, data=payload, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
     #     return
 
-    # def prep_files_to_process( self, github_json ):
-    #     """ Prepares the data-dict to be sent to the first rq job. """
-    #     files_to_process = { u'files_updated': [], u'files_removed': [], u'timestamp': unicode(datetime.datetime.now()) }
-    #     if github_json:
-    #         commit_info = json.loads( github_json )
-    #         ( added, modified, removed ) = self._examine_commits( commit_info )
-    #         files_to_process[u'files_updated'] = added
-    #         files_to_process[u'files_updated'].extend( modified )  # solrization same for added or modified
-    #         files_to_process[u'files_removed'] = removed
-    #     log.debug( 'files_to_process, ```{}```'.format(pprint.pformat(files_to_process)) )
-    #     return files_to_process
-
-    # def _examine_commits( self, commit_info ):
-    #     """ Extracts and returns file-paths for the different kinds of commits.
-    #         Called by prep_files_to_process(). """
-    #     added = []
-    #     modified = []
-    #     removed = []
-    #     for commit in commit_info[u'commits']:
-    #         added.extend( commit[u'added'] )
-    #         modified.extend( commit[u'modified'] )
-    #         removed.extend( commit[u'removed'] )
-    #     return ( added, modified, removed )
