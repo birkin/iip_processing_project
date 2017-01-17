@@ -83,7 +83,7 @@ class GHHelper( object ):
             log.debug( 'gonna hit dev' )
             try:
                 r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD) )
-            except Exeption as e:
+            except Exception as e:
                 log.error( 'exception, ```{}```'.format(unicode(e)) )
             finally:
                 message = 'status_code, `{}`'.format( r.status_code )
