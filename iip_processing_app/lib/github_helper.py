@@ -84,7 +84,7 @@ class GHHelper( object ):
         if host == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
             try:
-                r = requests.post( self.DEV_URL, data=request_body, auth=(self.B_AUTH_USERNAME, self.B_AUTH_PASSWORD), timeout=10 )
+                r = requests.post( self.DEV_URL, data=request_body, auth=(self.AUTH_USERNAME, self.AUTH_PASSWORD), timeout=10 )
             except Exception as e:
                 log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
             finally:
