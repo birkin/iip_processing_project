@@ -78,6 +78,7 @@ class GHHelper( object ):
     def trigger_dev_if_production( self, request_body ):
         """ Sends github `data` to dev-server (which github can't hit) if this is the production-server.
             Called by handle_inscription_update() """
+        log.debug( 'starting' )
         message = 'not production'
         if data_dct['host'] == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
