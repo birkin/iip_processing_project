@@ -49,31 +49,28 @@ class GHHelper( object ):
     def handle_inscription_update( self, request_body ):
         """ Enqueues first of a series of processing jobs. """
         log.debug( 'request_body, ```{}```'.format(request_body) )
-        try:
-            data_dct = json.loads( request_body )
-            to_process_dct = self.prep_files_to_process( data_dct['commits'] )
-        except Exception as e:
-            log.debug( 'exception, ```{}```'.format(unicode(e)) )
+        data_dct = json.loads( request_body )
+        to_process_dct = self.prep_files_to_process( data_dct['commits'] )
         return
 
-    def prep_files_to_process( self, commits_dct ):
+    def prep_files_to_process( self, commits_lst ):
         """ Prepares the data-dict to be sent to the first rq job.
             Called by handle_inscription_update() """
         files_to_process = { u'files_updated': [], u'files_removed': [], u'timestamp': unicode(datetime.datetime.now()) }
-        ( added, modified, removed ) = self._examine_commits( commits_dct )
+        ( added, modified, removed ) = self._examine_commits( commits_lst )
         files_to_process[u'files_updated'] = added
         files_to_process[u'files_updated'].extend( modified )  # solrization same for added or modified
         files_to_process[u'files_removed'] = removed
         log.debug( 'files_to_process, ```{}```'.format(pprint.pformat(files_to_process)) )
         return files_to_process
 
-    def _examine_commits( self, commits_dct ):
+    def _examine_commits( self, commits_lst ):
         """ Extracts and returns file-paths for the different kinds of commits.
             Called by prep_files_to_process(). """
         added = []
         modified = []
         removed = []
-        for commit in commits_dct[u'commits']:
+        for commit in commits_lst:
             added.extend( commit[u'added'] )
             modified.extend( commit[u'modified'] )
             removed.extend( commit[u'removed'] )
