@@ -21,13 +21,13 @@ class GHHelper( object ):
     def parse_http_basic_auth( self, basic_auth_header_text ):
         """ Returns parsed username and password. """
         log.debug( 'starting parse_http_basic_auth()' )
-        return_dct = { 'username': None, 'password': None }
+        userpass_dct = { 'username': None, 'password': None }
         auth = basic_auth_header_text.split()
         if len(auth) == 2:
             if auth[0].lower() == 'basic':
-                received_username, received_password = base64.b64decode(auth[1]).split(':')
-                return_dct = { 'received_username': received_username, 'received_password': received_password }
-        return return_dct
+                ( received_username, received_password ) = base64.b64decode( auth[1] ).split( ':' )
+                userpass_dct = { 'received_username': received_username, 'received_password': received_password }
+        return userpass_dct
 
     def validate_credentials( self, received_auth_dct ):
         """ Checks credentials. """
