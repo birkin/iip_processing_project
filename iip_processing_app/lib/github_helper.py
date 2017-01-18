@@ -40,7 +40,7 @@ class GHHelper( object ):
     def make_unauthenticated_response( self ):
         """ Returns proper 401 response. """
         log.debug( 'preparing 401 response' )
-        resp = HttpResponse( '401 / Not Authenticated ' )
+        resp = HttpResponse( '401 / Not Authenticated' )
         resp.status_code = 401
         resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
         return resp
