@@ -50,6 +50,9 @@ class GHHelper( object ):
         log.debug( 'request_body, ```{}```'.format(request_body) )
         data_dct = json.loads( request_body )
         to_process_dct = self.prep_files_to_process( data_dct['commits'] )
+        q.enqueue_call (
+            func='iip_processin_app.lib.processor.run_call_git_pull',
+            kwargs = {'to_process_dct': to_process_dct} )
         self.trigger_dev_if_production( request_body, host )
         return
 

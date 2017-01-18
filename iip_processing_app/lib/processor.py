@@ -5,8 +5,7 @@ from __future__ import unicode_literals
 """
 Contains:
 - Puller() class, for running git-pull.
-- Copier() class, for moving files from the local git directory to the web-accessible unified-inscription directory.
-- Two job-queue caller functions (one for each class).
+- A job-queue caller function.
 """
 
 import datetime, json, logging, os, pprint, shutil, time
@@ -26,6 +25,7 @@ class Puller( object ):
         """ Runs git_pull.
                 Returns list of filenames.
             Called by run_call_git_pull(). """
+        log.debug( 'starting call_git_pull()' )
         original_directory = os.getcwd()
         os.chdir( self.GIT_CLONED_DIR_PATH )
         command = 'git pull'
@@ -41,17 +41,17 @@ class Puller( object ):
 
 q = rq.Queue( u'iip_processing', connection=redis.Redis() )
 
-def run_call_git_pull( files_to_process ):
+def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
             Eventually spawns a call to indexer.run_update_index() which handles each result found.
-        Triggered by views.git_watcher(). """
-    assert sorted( files_to_process.keys() ) == [ 'files_removed', 'files_updated', 'timestamp']
-    log.debug( u'in utils.processor.run_call_git_pull(); files_to_process, `%s`' % pprint.pformat(files_to_process) )
-    time.sleep( 2 )  # let any existing jobs in process finish
+        Triggered by views.gh_inscription_watcher(). """
+    assert sorted( to_process_dct.keys() ) == [ 'files_removed', 'files_updated', 'timestamp']
+    log.debug( 'to_process_dct, ```{}```'.format(pprint.pformat(to_process_dct)) )
+    time.sleep( 2 )  # let any existing in-process pull finish
     puller = Puller()
     puller.call_git_pull()
     log.debug( 'enqueuing next job' )
-    q.enqueue_call(
-        func=u'iip_processing_app.lib.processor.run_some_step',
-        kwargs={u'files_to_update': files_to_update, u'files_to_remove': files_to_remove} )
+    # q.enqueue_call(
+    #     func=u'iip_processing_app.lib.processor.run_some_step',
+    #     kwargs={u'files_to_update': files_to_update, u'files_to_remove': files_to_remove} )
     return
