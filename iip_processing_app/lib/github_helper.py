@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import base64, datetime, json, logging, os, pprint
 import requests
 from django.http import HttpResponse
+from iip_processing_app.lib import processor
 
 
 log = logging.getLogger(__name__)
@@ -21,13 +22,13 @@ class GHHelper( object ):
     def parse_http_basic_auth( self, basic_auth_header_text ):
         """ Returns parsed username and password. """
         log.debug( 'starting parse_http_basic_auth()' )
-        return_dct = { 'username': None, 'password': None }
+        userpass_dct = { 'username': None, 'password': None }
         auth = basic_auth_header_text.split()
         if len(auth) == 2:
             if auth[0].lower() == 'basic':
-                received_username, received_password = base64.b64decode(auth[1]).split(':')
-                return_dct = { 'received_username': received_username, 'received_password': received_password }
-        return return_dct
+                ( received_username, received_password ) = base64.b64decode( auth[1] ).split( ':' )
+                userpass_dct = { 'received_username': received_username, 'received_password': received_password }
+        return userpass_dct
 
     def validate_credentials( self, received_auth_dct ):
         """ Checks credentials. """
@@ -40,7 +41,7 @@ class GHHelper( object ):
     def make_unauthenticated_response( self ):
         """ Returns proper 401 response. """
         log.debug( 'preparing 401 response' )
-        resp = HttpResponse( '401 / Not Authenticated ' )
+        resp = HttpResponse( '401 / Not Authenticated' )
         resp.status_code = 401
         resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
         return resp
@@ -50,6 +51,10 @@ class GHHelper( object ):
         log.debug( 'request_body, ```{}```'.format(request_body) )
         data_dct = json.loads( request_body )
         to_process_dct = self.prep_files_to_process( data_dct['commits'] )
+        processor.run_call_git_pull( to_process_dct )
+        # q.enqueue_call (
+        #     func='iip_processing_app.lib.processor.run_call_git_pull',
+        #     kwargs = {'to_process_dct': to_process_dct} )
         self.trigger_dev_if_production( request_body, host )
         return
 
