@@ -4,14 +4,16 @@ from __future__ import unicode_literals
 import logging, os
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
+from iip_processing_app.lib.processor import Puller
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
+puller = Puller()
 
 
-class RootUrlTest( TestCase ):
+class RootUrlTest(TestCase):
     """ Checks root urls. """
 
     def test_root_url_no_slash(self):
@@ -31,7 +33,7 @@ class RootUrlTest( TestCase ):
     # end class RootUrlTest()
 
 
-class HBAuthParserTest( TestCase ):
+class HBAuthParserTest(TestCase):
     """ Checks parsing of http-basic-auth incoming info. """
 
     def setUp(self):
@@ -45,3 +47,16 @@ class HBAuthParserTest( TestCase ):
             { 'received_username': self.hbauth_good_username, 'received_password': self.hbauth_good_password },
             gh_helper.parse_http_basic_auth( self.test_hbauth_header )
             )
+
+
+class ProcessorTest(TestCase):
+    """ Checks processor.py functions. """
+
+    def test_call_git_pull(self):
+        """ Checks for successful pull. """
+        self.assertEqual(
+            'foo',
+            puller.call_git_pull()
+            )
+
+
