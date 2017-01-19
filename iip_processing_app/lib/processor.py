@@ -61,14 +61,54 @@ q = rq.Queue( u'iip_processing', connection=redis.Redis() )
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
             Eventually spawns a call to indexer.run_update_index() which handles each result found.
-        Triggered by views.gh_inscription_watcher(). """
+        Called by views.gh_inscription_watcher(). """
     assert sorted( to_process_dct.keys() ) == [ 'files_removed', 'files_updated', 'timestamp']
     log.debug( 'to_process_dct, ```{}```'.format(pprint.pformat(to_process_dct)) )
     time.sleep( 2 )  # let any existing in-process pull finish
     puller = Puller()
     puller.call_git_pull()
     log.debug( 'enqueuing next job' )
-    # q.enqueue_call(
-    #     func=u'iip_processing_app.lib.processor.run_some_step',
-    #     kwargs={u'files_to_update': files_to_update, u'files_to_remove': files_to_remove} )
+    q.enqueue_call(
+        func=u'iip_processing_app.lib.processor.run_backup_statuses',
+        kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
     return
+
+def run_backup_statuses( files_to_update, files_to_remove ):
+    """ Backs up statuses.
+        Called by run_call_git_pull() """
+    log.debug( 'call to backup class/function will go here' )
+    log.debug( 'enqueuing next job' )
+    for file_to_update in files_to_update:
+        q.enqueue_call(
+            func=u'iip_processing_app.lib.processor.run_process_file',
+            kwargs={u'file_to_update': file_to_update} )
+    for file_to_remove in files_to_remove:
+        q.enqueue_call(
+            func=u'iip_processing_app.lib.processor.run_remove_file_from_index',
+            kwargs={u'file_to_remove': file_to_remove} )
+
+def run_process_file( file_to_update ):
+    """ Prepares file for indexing.
+        Called by run_backup_statuses() """
+    log.debug( 'call to process-file class/function will go here' )
+    file_to_update_data = {'foo': 'bar'}
+    log.debug( 'enqueuing next job' )
+    q.enqueue_call(
+        func=u'iip_processing_app.lib.processor.run_update_index',
+        kwargs={u'file_to_update_data': file_to_update_data} )
+
+def run_update_index( file_to_update_data ):
+    """ Updates index with new or changed info.
+        Called by run_process_file() """
+    log.debug( 'call to index-file class/function will go here' )
+    log.debug( 'done processing file' )
+
+def run_remove_file_from_index( files_to_remove ):
+    """ Removes file from index.
+        Called by run_backup_statuses() """
+    log.debug( 'call to remove-from-index class/function will go here' )
+    log.debug( 'done processing file' )
+
+
+
+
