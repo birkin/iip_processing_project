@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 class Puller( object ):
     """ Contains funcions for executing git-pull. """
 
-    def __init__( self, log ):
+    def __init__( self ):
         """ Settings. """
         self.GIT_CLONED_DIR_PATH = unicode( os.environ.get('usep_gh__GIT_CLONED_DIR_PATH') )
 
@@ -31,8 +31,21 @@ class Puller( object ):
         os.chdir( self.GIT_CLONED_DIR_PATH )
         command = 'git pull'
         r = envoy.run( command.encode('utf-8') )  # envoy requires strings
-        log_helper.log_envoy_output( self.log, r )
+        self.track_envoy_call( r )
         os.chdir( original_directory )
+        return
+
+    def track_envoy_call( self, envoy_response ):
+        """ Returns dct convenient for logging.
+            Called by call_git_pull() """
+        track_dct = {
+            'status_code': envoy_response.status_code,  # int
+            'std_out': envoy_response.std_out.decode(u'utf-8'),
+            'std_err': envoy_response.std_err.decode(u'utf-8'),
+            'command': envoy_response.command,  # list
+            'history': envoy_response.history  # list
+            }
+        log.debug( 'envoy response, ```{}```'.format(pprint.pformat(track_dct)) )
         return
 
     ## end class Puller()
