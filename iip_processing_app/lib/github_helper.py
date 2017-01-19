@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import base64, datetime, json, logging, os, pprint
 import requests
 from django.http import HttpResponse
+from iip_processing_app.lib import processor
 
 
 log = logging.getLogger(__name__)
@@ -50,9 +51,10 @@ class GHHelper( object ):
         log.debug( 'request_body, ```{}```'.format(request_body) )
         data_dct = json.loads( request_body )
         to_process_dct = self.prep_files_to_process( data_dct['commits'] )
-        q.enqueue_call (
-            func='iip_processin_app.lib.processor.run_call_git_pull',
-            kwargs = {'to_process_dct': to_process_dct} )
+        processor.run_call_git_pull( to_process_dct )
+        # q.enqueue_call (
+        #     func='iip_processing_app.lib.processor.run_call_git_pull',
+        #     kwargs = {'to_process_dct': to_process_dct} )
         self.trigger_dev_if_production( request_body, host )
         return
 
