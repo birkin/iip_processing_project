@@ -28,11 +28,14 @@ class Puller( object ):
             Called by run_call_git_pull(). """
         log.debug( 'starting call_git_pull()' )
         original_directory = os.getcwd()
+        log.debug( 'original_directory, ```{}```'.format(original_directory) )
         os.chdir( self.GIT_CLONED_DIR_PATH )
+        log.debug( 'temp directory, ```{}```'.format(os.getcwd()) )
         command = 'git pull'
         r = envoy.run( command.encode('utf-8') )  # envoy requires strings
         self.track_envoy_call( r )
         os.chdir( original_directory )
+        log.debug( 'directory after change-back, ```{}```'.format(os.getcwd()) )
         return
 
     def track_envoy_call( self, envoy_response ):
