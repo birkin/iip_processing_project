@@ -33,13 +33,13 @@ class Puller( object ):
         log.debug( 'temp directory, ```{}```'.format(os.getcwd()) )
         command = 'git pull'
         r = envoy.run( command.encode('utf-8') )  # envoy requires strings
-        self.track_envoy_call( r )
+        track_dct = self.track_envoy_call( r )
         os.chdir( original_directory )
         log.debug( 'directory after change-back, ```{}```'.format(os.getcwd()) )
-        return
+        return track_dct['status_code']
 
     def track_envoy_call( self, envoy_response ):
-        """ Returns dct convenient for logging.
+        """ Creates dct convenient for logging and status_code access.
             Called by call_git_pull() """
         track_dct = {
             'status_code': envoy_response.status_code,  # int
@@ -49,7 +49,7 @@ class Puller( object ):
             'history': envoy_response.history  # list
             }
         log.debug( 'envoy response, ```{}```'.format(pprint.pformat(track_dct)) )
-        return
+        return track_dct
 
     ## end class Puller()
 

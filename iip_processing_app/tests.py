@@ -55,7 +55,7 @@ class ProcessorTest(TestCase):
     def test_call_git_pull(self):
         """ Checks for successful pull. """
         self.assertEqual(
-            'foo',
+            0,  # 0 means no problems; 1 means a problem
             puller.call_git_pull()
             )
 
