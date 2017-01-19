@@ -20,7 +20,7 @@ class Puller( object ):
 
     def __init__( self ):
         """ Settings. """
-        self.GIT_CLONED_DIR_PATH = unicode( os.environ.get('usep_gh__GIT_CLONED_DIR_PATH') )
+        self.GIT_CLONED_DIR_PATH = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
 
     def call_git_pull( self ):
         """ Runs git_pull.
