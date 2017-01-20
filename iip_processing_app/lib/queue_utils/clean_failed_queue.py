@@ -1,6 +1,8 @@
 
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 """ Cleans up default rq failed-queue.
     Only cleans up jobs from a target queue.
     Useful for experimenting with rq & redis.
@@ -10,14 +12,15 @@ import os, pprint
 import redis, rq
 
 
-TARGET_QUEUE = u'iip'
-queue_name = u'failed'
-q = rq.Queue( queue_name, connection=redis.Redis() )
+QUEUE_NAME = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+
+
+failed_queue = rq.queue.get_failed_queue( connection=redis.Redis(u'localhost') )
 
 d = { u'jobs': [] }
 failed_count = 0
-for job in q.jobs:
-    if not job.origin == TARGET_QUEUE:
+for job in failed_queue.jobs:
+    if not job.origin == QUEUE_NAME:
         continue
     failed_count += 1
     job_d = {

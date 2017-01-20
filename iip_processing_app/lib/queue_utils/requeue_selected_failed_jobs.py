@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import os, sys
 import redis, rq
 
 
+QUEUE_NAME = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+
+
 failed_queue = rq.queue.get_failed_queue( connection=redis.Redis(u'localhost') )
-IIP_ORIGIN_QUEUE = u'iip'
 
 for job in failed_queue.jobs:
-    if not job.origin == IIP_ORIGIN_QUEUE:
+    if not job.origin == QUEUE_NAME:
         print( u'skipping non-iip function call: %s' % job.func_name )
         continue
     else:

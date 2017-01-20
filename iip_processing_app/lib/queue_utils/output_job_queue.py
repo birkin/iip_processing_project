@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import os, pprint
 import redis, rq
 
 
-queue_name = u'iip'
-q = rq.Queue( queue_name, connection=redis.Redis() )
+QUEUE_NAME = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
 
-print u'- number of jobs in queue `%s`: %s' % ( queue_name, len(q.jobs) )
+
+q = rq.Queue( QUEUE_NAME, connection=redis.Redis() )
+
+print u'- number of jobs in queue `%s`: %s' % ( QUEUE_NAME, len(q.jobs) )
 
 for job in q.jobs:
     job_d = {

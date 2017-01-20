@@ -17,12 +17,9 @@
 # (to confirm new worker is running)
 
 
-IIP_WORKER_NAME=iip_worker_$RANDOM
-IIP_WORKER_LOG_FILENAME=$IIP_WORKER__LOG_DIR_PATH/$IIP_WORKER_NAME.log
-IIP_QUEUE_NAME="iip"
 
-echo "worker name: " $IIP_WORKER_NAME
-echo "log filename: " $IIP_WORKER_LOG_FILENAME
-echo "queue name: " $IIP_QUEUE_NAME
+echo "worker name: " $IIP_PRC__WORKER_NAME
+echo "log filename: " $IIP_PRC__WORKER_LOG_FILENAME
+echo "queue name: " $IIP_PRC__QUEUE_NAME
 
-rqworker --name $IIP_WORKER_NAME $IIP_QUEUE_NAME >> $IIP_WORKER_LOG_FILENAME 2>&1 &
+rqworker --name $IIP_PRC__WORKER_NAME $IIP_PRC__QUEUE_NAME >> $IIP_PRC__WORKER_LOG_FILENAME 2>&1 &
