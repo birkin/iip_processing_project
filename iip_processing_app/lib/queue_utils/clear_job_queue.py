@@ -11,7 +11,7 @@ QUEUE_NAME = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
 
 q = rq.Queue( QUEUE_NAME, connection=redis.Redis() )
 
-print u'- initial number of jobs in queue `%s`: %s' % ( queue_name, len(q.jobs) )
+print u'- initial number of jobs in queue `%s`: %s' % ( QUEUE_NAME, len(q.jobs) )
 
 for job in q.jobs:
     job_d = {
@@ -31,4 +31,4 @@ for job in q.jobs:
     print u'- deleted.'
     print u'---'
 
-print u'- current number of jobs in queue `%s`: %s' % ( queue_name, len(q.jobs) )
+print u'- current number of jobs in queue `%s`: %s' % ( QUEUE_NAME, len(q.jobs) )
