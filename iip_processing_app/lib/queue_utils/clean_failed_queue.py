@@ -42,7 +42,7 @@ for job in failed_queue.jobs:
     job.delete()
 d[u'initial_failed_target_count'] = failed_count
 
-q2 = rq.Queue( queue_name, connection=redis.Redis() )
+q2 = rq.Queue( QUEUE_NAME, connection=redis.Redis() )
 d[u'current_failed_target_count'] = len(q2.jobs)
 
 pprint.pprint( d )
