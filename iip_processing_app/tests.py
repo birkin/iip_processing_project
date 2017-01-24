@@ -2,8 +2,10 @@
 
 from __future__ import unicode_literals
 import logging, os
+import redis, rq
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
+from iip_processing_app.lib import processor
 from iip_processing_app.lib.processor import Puller
 
 
@@ -52,6 +54,9 @@ class HBAuthParserTest(TestCase):
 class ProcessorTest(TestCase):
     """ Checks processor.py functions. """
 
+    def setUp(self):
+        self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+
     def test_call_git_pull(self):
         """ Checks for successful pull. """
         self.assertEqual(
@@ -59,4 +64,17 @@ class ProcessorTest(TestCase):
             puller.call_git_pull()
             )
 
-
+    def test_run_call_git_pull(self):
+        """ Checks for successful job-in-progress. """
+        ## confirm no jobs running
+        q = rq.Queue( self.queue_name, connection=redis.Redis() )
+        self.assertEqual( 0, len(q.jobs) )
+        ## call processor.run_call_git_pull( to_process_dct )
+        to_process_dct = {
+            u'files_removed': [],
+            u'files_updated': [u'epidoc-files/abur0001.xml'],
+            u'timestamp': u'2017-01-24 09:52:38.911009' }
+        processor.run_call_git_pull( to_process_dct )
+        ## confirm jobs running
+        q = rq.Queue( self.queue_name, connection=redis.Redis() )
+        self.assertEqual( 1, len(q.jobs) )
