@@ -8,11 +8,16 @@ Contains:
 - A job-queue caller function.
 """
 
-import datetime, json, logging, os, pprint, shutil, time
+import datetime, json, logging, logging.config, os, pprint, shutil, time
 import envoy, redis, rq
+from django.conf import settings as project_settings
 
 
 log = logging.getLogger(__name__)
+if not logging._handlers:  # true when module accessed by queue-jobs
+    worker_config_dct = json.loads( os.environ['IIP_PRC__JOB_LOG_CONFIG_JSON'] )
+    worker_config_dct['loggers']['iip_processing_app']['level'] = unicode( os.environ[u'IIP_PRC__LOG_LEVEL'] )
+    logging.config.dictConfig( worker_config_dct )
 
 
 class Puller( object ):
@@ -54,9 +59,27 @@ class Puller( object ):
     ## end class Puller()
 
 
+class StatusBackuper( object ):
+    """ Manages creation and storage of json file of backup statuses. """
+
+    def __init__( self ):
+        """ Settings. """
+        pass
+
+    def make_status_json( self ):
+        log.debug( 'Call to solr will go here' )
+        return
+
+    def push_to_github( self ):
+        log.debug( 'Push to github will go here' )
+        return
+
+    ## end clas StatusBackuper()
+
+
 ## runners ##
 
-q = rq.Queue( u'iip_processing', connection=redis.Redis() )
+q = rq.Queue( u'iip_prc', connection=redis.Redis() )
 
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
@@ -77,6 +100,9 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull() """
     log.debug( 'call to backup class/function will go here' )
+    backuper = StatusBackuper()
+    backuper.make_status_json()
+    backuper.push_to_github()
     log.debug( 'enqueuing next job' )
     for file_to_update in files_to_update:
         q.enqueue_call(
@@ -108,7 +134,3 @@ def run_remove_file_from_index( files_to_remove ):
         Called by run_backup_statuses() """
     log.debug( 'call to remove-from-index class/function will go here' )
     log.debug( 'done processing file' )
-
-
-
-
