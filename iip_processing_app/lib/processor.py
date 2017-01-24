@@ -9,7 +9,7 @@ Contains:
 """
 
 import datetime, json, logging, logging.config, os, pprint, shutil, time
-import envoy, redis, rq
+import envoy, redis, requests, rq
 from django.conf import settings as project_settings
 
 
@@ -64,15 +64,31 @@ class StatusBackuper( object ):
 
     def __init__( self ):
         """ Settings. """
-        pass
+        self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
+        self.DISPLAY_STATUSES_BACKUP_DIR = unicode( os.environ['IIP_PRC__DISPLAY_STATUSES_BACKUP_DIR'] )
 
     def make_status_json( self ):
-        log.debug( 'Call to solr will go here' )
+        """ Queries solr for current display-statuses and saves result to a json file.
+            Called by run_backup_statuses(). """
+        url = '{}/select?q=*:*&rows=6000&fl=inscription_id,display_status&wt=json&indent=true'.format( self.SOLR_URL )
+        log.debug( 'url, ```{}```'.format(url) )
+        r = requests.get( url )
+        status_json = r.content
+        return status_json
+
+    def push_to_github( self, status_json ):
+        """ Eventually will be pushed to github, for now, is saved to disk.
+            Called by run_backup_statuses(). """
+        filename = 'display_statuses_backup_{}.json'.format( unicode(datetime.datetime.now()) ).replace( ' ', '_' )
+        filepath = '{dir}/{fname}'.format( dir=self.DISPLAY_STATUSES_BACKUP_DIR, fname=filename )
+        log.debug( 'filepath, ```{}```'.format(filepath) )
+        with open( filepath, 'w' ) as f:
+            f.write( status_json )
         return
 
-    def push_to_github( self ):
-        log.debug( 'Push to github will go here' )
-        return
+    def delete_old_backups( self ):
+        log.debug( 'delete old backups code will go here' )
+        pass
 
     ## end clas StatusBackuper()
 
@@ -80,6 +96,8 @@ class StatusBackuper( object ):
 ## runners ##
 
 q = rq.Queue( u'iip_prc', connection=redis.Redis() )
+puller = Puller()
+backuper = StatusBackuper()
 
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
@@ -99,11 +117,9 @@ def run_call_git_pull( to_process_dct ):
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull() """
-    log.debug( 'call to backup class/function will go here' )
-    backuper = StatusBackuper()
-    backuper.make_status_json()
-    backuper.push_to_github()
-    log.debug( 'enqueuing next job' )
+    status_json = backuper.make_status_json()
+    backuper.push_to_github( status_json )
+    backuper.delete_old_backups()
     for file_to_update in files_to_update:
         q.enqueue_call(
             func=u'iip_processing_app.lib.processor.run_process_file',
