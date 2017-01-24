@@ -65,7 +65,9 @@ class StatusBackuper( object ):
     def __init__( self ):
         """ Settings. """
         self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
-        self.DISPLAY_STATUSES_BACKUP_DIR = unicode( os.environ['IIP_PRC__DISPLAY_STATUSES_BACKUP_DIR'] )
+        self.STATUSES_GIST_URL = unicode( os.environ['IIP_PRC__STATUSES_GIST_URL'] )
+        self.STATUSES_GIST_USERNAME = unicode( os.environ['IIP_PRC__STATUSES_GIST_USERNAME'] )
+        self.STATUSES_GIST_PASSWORD = unicode( os.environ['IIP_PRC__STATUSES_GIST_PASSWORD'] )
 
     def make_status_json( self ):
         """ Queries solr for current display-statuses and saves result to a json file.
@@ -76,19 +78,18 @@ class StatusBackuper( object ):
         status_json = r.content
         return status_json
 
-    def push_to_github( self, status_json ):
-        """ Eventually will be pushed to github, for now, is saved to disk.
+    def update_github( self, status_json ):
+        """ Saves statuses to gist.
             Called by run_backup_statuses(). """
-        filename = 'display_statuses_backup_{}.json'.format( unicode(datetime.datetime.now()) ).replace( ' ', '_' )
-        filepath = '{dir}/{fname}'.format( dir=self.DISPLAY_STATUSES_BACKUP_DIR, fname=filename )
-        log.debug( 'filepath, ```{}```'.format(filepath) )
-        with open( filepath, 'w' ) as f:
-            f.write( status_json )
+        auth = requests.auth.HTTPBasicAuth( self.STATUSES_GIST_USERNAME, self.STATUSES_GIST_PASSWORD )
+        json_payload = json.dumps( {
+            "description": self.STATUSES_GIST_DESCRIPTION,
+            "files": {
+                self.STATUSES_GIST_FILENAME: { "content": status_json },
+              }
+            } )
+        r = requests.patch( url=self.STATUSES_GIST_URL, auth=auth, data=json_payload )
         return
-
-    def delete_old_backups( self ):
-        log.debug( 'delete old backups code will go here' )
-        pass
 
     ## end clas StatusBackuper()
 
@@ -118,8 +119,7 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull() """
     status_json = backuper.make_status_json()
-    backuper.push_to_github( status_json )
-    backuper.delete_old_backups()
+    backuper.update_github( status_json )
     for file_to_update in files_to_update:
         q.enqueue_call(
             func=u'iip_processing_app.lib.processor.run_process_file',
