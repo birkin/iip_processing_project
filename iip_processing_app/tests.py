@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import logging, os
+import logging, os, time
 import redis, rq
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
@@ -65,16 +65,31 @@ class ProcessorTest(TestCase):
             )
 
     def test_run_call_git_pull(self):
-        """ Checks for successful job-in-progress. """
-        ## confirm no jobs running
+        """ Triggers processing; checks for no failed jobs. """
+        ## confirm no processing jobs running
         q = rq.Queue( self.queue_name, connection=redis.Redis() )
         self.assertEqual( 0, len(q.jobs) )
+        ##
+        ## confirm no processing failed jobs
+        failed_queue = rq.queue.get_failed_queue( connection=redis.Redis() )
+        failed_count = 0
+        for job in failed_queue.jobs:
+            if job.origin == self.queue_name:
+                failed_count += 1
+        self.assertEqual( 0, failed_count )
+        ##
         ## call processor.run_call_git_pull( to_process_dct )
         to_process_dct = {
             u'files_removed': [],
             u'files_updated': [u'epidoc-files/abur0001.xml'],
             u'timestamp': u'2017-01-24 09:52:38.911009' }
         processor.run_call_git_pull( to_process_dct )
-        ## confirm jobs running
-        q = rq.Queue( self.queue_name, connection=redis.Redis() )
-        self.assertEqual( 1, len(q.jobs) )
+        ##
+        ## confirm no processing failed jobs
+        time.sleep( 2 )
+        failed_queue = rq.queue.get_failed_queue( connection=redis.Redis() )
+        failed_count = 0
+        for job in failed_queue.jobs:
+            if job.origin == self.queue_name:
+                failed_count += 1
+        self.assertEqual( 0, failed_count )
