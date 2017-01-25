@@ -141,10 +141,26 @@ class Prepper( object ):
     def __init__( self ):
         pass
 
-    def make_solr_data( self ):
+    def make_solr_data( self, file_id, status_json ):
         """ Manages preparation of solr data.
             Called by run_prep_file() """
-        pass
+        display_status = self.determine_display_status( file_id, status_json )
+        return { 'foo': 'bar' }
+
+    def determine_display_status( self, file_id, status_json ):
+        """ Returns display_status
+            Called by make_solr_data() """
+        dct = json.loads( status_json )
+        docs = dct['response']['docs']
+        status_dct = {}
+        for doc in docs:
+            status_dct[ doc['inscription_id'] ] = doc['display_status']
+        if file_id in status_dct:
+            display_status = status_dct[ file_id ]
+        else:
+            display_status = 'to_approve'
+        log.debug( 'display_status, `{}`'.format(display_status) )
+        return display_status
 
     ## end class Prepper()
 
@@ -183,11 +199,11 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             func='iip_processing_app.lib.processor.run_remove_file_from_index',
             kwargs={'file_to_remove': file_to_remove} )
 
-def run_prep_file( file_to_update, status_json ):
+def run_prep_file( file_id, status_json ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
-    log.debug( 'file_to_update, ```{}```'.format(file_to_update) )
-    prepared_solr_data = prepper.make_solr_data( file_to_update, status_json )
+    log.debug( 'file_id, ```{}```'.format(file_id) )
+    prepared_solr_data = prepper.make_solr_data( file_id, status_json )
     log.debug( 'enqueuing next job' )
     q.enqueue_call(
         func=u'iip_processing_app.lib.processor.run_update_index',
