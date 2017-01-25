@@ -62,14 +62,14 @@ class GHHelper( object ):
         """ Prepares the data-dict to be sent to the first rq job.
             Called by handle_inscription_update() """
         files_to_process = { u'files_updated': [], u'files_removed': [], u'timestamp': unicode(datetime.datetime.now()) }
-        ( added, modified, removed ) = self._examine_commits( commits_lst )
+        ( added, modified, removed ) = self.examine_commits( commits_lst )
         files_to_process[u'files_updated'] = added
         files_to_process[u'files_updated'].extend( modified )  # solrization same for added or modified
         files_to_process[u'files_removed'] = removed
         log.debug( 'files_to_process, ```{}```'.format(pprint.pformat(files_to_process)) )
         return files_to_process
 
-    def _examine_commits( self, commits_lst ):
+    def examine_commits( self, commits_lst ):
         """ Extracts and returns file-paths for the different kinds of commits.
             Called by prep_files_to_process(). """
         added = []
