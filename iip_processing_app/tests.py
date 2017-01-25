@@ -82,7 +82,8 @@ class GitHubResponseTest(TestCase):
             }
           ]''')
         self.assertEqual(
-            ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
+            # ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
+            ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
             gh_helper.examine_commits( commits_list )
             )
 
