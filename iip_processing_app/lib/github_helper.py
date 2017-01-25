@@ -84,14 +84,15 @@ class GHHelper( object ):
         return ( cleaned_added, cleaned_modified, cleaned_removed )
 
     def clean_list( self, initial_list ):
-        """ Ensures only inscriptions are returned, and that directory-string is removed.
+        """ Ensures only inscriptions are returned, and that directory-string, and '.xml' are removed.
             Called by examine_commits() """
         log.debug( 'initial_list, ```{}```'.format(initial_list) )
         cleaned = []
         dir_segment = 'epidoc-files/'
         for entry in initial_list:
             if dir_segment in entry:  ## good inscription
-                cleaned.append( entry.replace(dir_segment, '') )
+                # cleaned.append( entry.replace(dir_segment, '') )
+                cleaned.append( entry.replace(dir_segment, '').replace('.xml', '') )
         log.debug( 'cleaned, ```{}```'.format(cleaned) )
         return cleaned
 
