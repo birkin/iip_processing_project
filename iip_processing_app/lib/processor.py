@@ -193,7 +193,7 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     for file_to_update in files_to_update:
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_prep_file',
-            kwargs={'file_to_update': file_to_update, 'status_json': status_json} )
+            kwargs={'file_id': file_to_update, 'status_json': status_json} )
     for file_to_remove in files_to_remove:
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_remove_file_from_index',
