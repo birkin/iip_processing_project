@@ -170,6 +170,7 @@ class Prepper( object ):
 q = rq.Queue( u'iip_prc', connection=redis.Redis() )
 puller = Puller()
 backupper = StatusBackupper()
+prepper = Prepper()
 
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
