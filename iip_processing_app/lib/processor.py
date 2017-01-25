@@ -59,7 +59,7 @@ class Puller( object ):
     ## end class Puller()
 
 
-class StatusBackuper( object ):
+class StatusBackupper( object ):
     """ Manages creation and storage of json file of backup statuses. """
 
     def __init__( self ):
@@ -132,14 +132,17 @@ class StatusBackuper( object ):
                 os.remove( backup_filepath )
         return
 
-    ## end class StatusBackuper()
+    ## end class StatusBackupper()
+
+
+
 
 
 ## runners ##
 
 q = rq.Queue( u'iip_prc', connection=redis.Redis() )
 puller = Puller()
-backuper = StatusBackuper()
+backupper = StatusBackupper()
 
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
@@ -159,7 +162,7 @@ def run_call_git_pull( to_process_dct ):
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull() """
-    backuper.make_backup()
+    backupper.make_backup()
     for file_to_update in files_to_update:
         q.enqueue_call(
             func=u'iip_processing_app.lib.processor.run_process_file',
