@@ -72,14 +72,28 @@ class GHHelper( object ):
     def examine_commits( self, commits_lst ):
         """ Extracts and returns file-paths for the different kinds of commits.
             Called by prep_files_to_process(). """
-        added = []
-        modified = []
-        removed = []
+        ( added, modified, removed ) = ( [], [], [] )
         for commit in commits_lst:
             added.extend( commit[u'added'] )
             modified.extend( commit[u'modified'] )
             removed.extend( commit[u'removed'] )
-        return ( added, modified, removed )
+        cleaned_added = sorted( self.clean_list(added) )
+        cleaned_modified = sorted( self.clean_list(modified) )
+        cleaned_removed = sorted( self.clean_list(removed) )
+        log.debug( 'cleaned_added, ```{add}```; cleaned_modified, ```{mod}```; cleaned_removed, ```{rem}```'.format(add=cleaned_added, mod=cleaned_modified, rem=cleaned_removed) )
+        return ( cleaned_added, cleaned_modified, cleaned_removed )
+
+    def clean_list( self, initial_list ):
+        """ Ensures only inscriptions are returned, and that directory-string is removed.
+            Called by examine_commits() """
+        log.debug( 'initial_list, ```{}```'.format(initial_list) )
+        cleaned = []
+        dir_segment = 'epidoc-files/'
+        for entry in initial_list:
+            if dir_segment in entry:  ## good inscription
+                cleaned.append( entry.replace(dir_segment, '') )
+        log.debug( 'cleaned, ```{}```'.format(cleaned) )
+        return cleaned
 
     def trigger_dev_if_production( self, request_body, host ):
         """ Sends github `data` to dev-server (which github can't hit) if this is the production-server.
