@@ -139,7 +139,7 @@ class Prepper( object ):
     """ Manages prep for solr post. """
 
     def __init__( self ):
-        pass
+        self.XML_DIR = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
 
     def make_solr_data( self, file_id, status_json ):
         """ Manages preparation of solr data.
@@ -168,7 +168,12 @@ class Prepper( object ):
     def grab_inscription( file_id ):
         """ Returns inscription xml.
             Called by make_solr_data() """
-        return 'foo'
+        filepath = '{dir}/{file_id}.xml'.format( dir=self.XML_DIR, file_id=file_id )
+        with open( filepath ) as f:
+            xml_utf8 = f.read()
+        xml = xml_utf8.decode( 'utf-8' )
+        log.debug( 'source_xml, ```{}```'.format(xml) )
+        return xml
 
     def make_initial_solr_doc( self, source_xml ):
         """ Returns result of xsl transform.
