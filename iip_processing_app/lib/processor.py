@@ -140,6 +140,7 @@ class Prepper( object ):
 
     def __init__( self ):
         self.XML_DIR = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
+        self.STYLESHEET_PATH = unicode( os.environ['IIP_PRC__SOLR_DOC_STYLESHEET_PATH'] )
 
     def make_solr_data( self, file_id, status_json ):
         """ Manages preparation of solr data.
@@ -178,7 +179,17 @@ class Prepper( object ):
     def make_initial_solr_doc( self, source_xml ):
         """ Returns result of xsl transform.
             Called by make_solr_data() """
-        return 'foo2'
+        log.debug( 'stylesheet_path, ```{}```'.format(self.STYLESHEET_PATH) )
+        log.debug( 'transformer url, ```{}```'.format(self.TRANSFORMER_URL) )
+        with open( self.STYLESHEET_PATH ) as f:
+            stylesheet_utf8 = f.read()
+        stylesheet = stylesheet_utf8.decode( 'utf-8' )
+        payload = {
+            'xml': source_xml, 'xsl': stylesheet, 'auth_key': self.TRANSFORMER_AUTH_KEY }
+        r = requests.post( self.TRANSFORMER_URL, data=payload )
+        transformed_xml = r.content.decode( 'utf-8' )
+        log.debug( 'transformed_xml, ```{}```'.format(transformed_xml) )
+        return transformed_xml
 
     def update_status( self, display_status, initial_solr_doc ):
         """ Updates solr doc with display-status.
