@@ -71,7 +71,9 @@ class GitHubResponseTest(TestCase):
               "id": "88cb3c31a7bcec4adc0558fbff74347d0a9245e1",
               "message": "test commit of comment.",
               "modified": [
-                "epidoc-files/abur0001.xml"
+                "epidoc-files/abur0001.xml",
+                "blah",
+                "epidoc-files/aaa123.xml"
               ],
               "removed": [],
               "timestamp": "2017-01-19T11:00:30-05:00",
@@ -80,7 +82,7 @@ class GitHubResponseTest(TestCase):
             }
           ]''')
         self.assertEqual(
-            'foo',
+            ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
             gh_helper.examine_commits( commits_list )
             )
 
