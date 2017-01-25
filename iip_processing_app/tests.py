@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import logging, os, time
+import json, logging, os, time
 import redis, rq
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
@@ -32,8 +32,6 @@ class RootUrlTest(TestCase):
         redirect_url = response._headers['location'][1]
         self.assertEqual(  '/info/', redirect_url )
 
-    # end class RootUrlTest()
-
 
 class HBAuthParserTest(TestCase):
     """ Checks parsing of http-basic-auth incoming info. """
@@ -48,6 +46,42 @@ class HBAuthParserTest(TestCase):
         self.assertEqual(
             { 'received_username': self.hbauth_good_username, 'received_password': self.hbauth_good_password },
             gh_helper.parse_http_basic_auth( self.test_hbauth_header )
+            )
+
+
+class GitHubResponseTest(TestCase):
+    """ Checks github response parsing. """
+
+    def test_examine_commits(self):
+        """ Checks extraction of files to process. """
+        commits_list = json.loads('''[
+            {
+              "added": [],
+              "author": {
+                "email": "birkin.diana@gmail.com",
+                "name": "Birkin James Diana",
+                "username": "birkin"
+              },
+              "committer": {
+                "email": "noreply@github.com",
+                "name": "GitHub",
+                "username": "web-flow"
+              },
+              "distinct": true,
+              "id": "88cb3c31a7bcec4adc0558fbff74347d0a9245e1",
+              "message": "test commit of comment.",
+              "modified": [
+                "epidoc-files/abur0001.xml"
+              ],
+              "removed": [],
+              "timestamp": "2017-01-19T11:00:30-05:00",
+              "tree_id": "e45afe1e50d17e94e9bc2a26a35f4b3f3457bb55",
+              "url": "https://github.com/Brown-University-Library/iip-texts/commit/88cb3c31a7bcec4adc0558fbff74347d0a9245e1"
+            }
+          ]''')
+        self.assertEqual(
+            'foo',
+            gh_helper.examine_commits( commits_list )
             )
 
 
