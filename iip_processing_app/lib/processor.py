@@ -79,7 +79,7 @@ class StatusBackupper( object ):
         self.update_github( status_json )
         self.save_locally( status_json )
         self.delete_old_backups()
-        return
+        return status_json
 
     def make_status_json( self ):
         """ Queries solr for current display-statuses and saves result to a json file.
@@ -142,6 +142,7 @@ class Prepper( object ):
         pass
 
     def check_if_new( self ):
+        existing_solr_inscri
         pass
 
     ## end class Prepper()
@@ -171,28 +172,27 @@ def run_call_git_pull( to_process_dct ):
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull() """
-    backupper.make_backup()
+    status_json = backupper.make_backup()
     for file_to_update in files_to_update:
         q.enqueue_call(
-            func=u'iip_processing_app.lib.processor.run_process_file',
-            kwargs={u'file_to_update': file_to_update} )
+            func='iip_processing_app.lib.processor.run_prep_file',
+            kwargs={'file_to_update': file_to_update, 'status_json': status_json} )
     for file_to_remove in files_to_remove:
         q.enqueue_call(
-            func=u'iip_processing_app.lib.processor.run_remove_file_from_index',
-            kwargs={u'file_to_remove': file_to_remove} )
+            func='iip_processing_app.lib.processor.run_remove_file_from_index',
+            kwargs={'file_to_remove': file_to_remove} )
 
-def run_prep_file( file_to_update ):
+def run_prep_file( file_to_update, status_json ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
     log.debug( 'file_to_update, ```{}```'.format(file_to_update) )
-    log.debug( 'call to process-file class/function will go here' )
-    file_to_update_data = {'foo': 'bar'}
+    prepared_solr_data = prepper.make_solr_data( file_to_update, status_json )
     log.debug( 'enqueuing next job' )
     q.enqueue_call(
         func=u'iip_processing_app.lib.processor.run_update_index',
-        kwargs={u'file_to_update_data': file_to_update_data} )
+        kwargs={u'prepared_solr_data': prepared_solr_data} )
 
-def run_update_index( file_to_update_data ):
+def run_update_index( prepared_solr_data ):
     """ Updates index with new or changed info.
         Called by run_prep_file() """
     log.debug( 'call to index-file class/function will go here' )
