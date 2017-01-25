@@ -145,7 +145,10 @@ class Prepper( object ):
         """ Manages preparation of solr data.
             Called by run_prep_file() """
         display_status = self.determine_display_status( file_id, status_json )
-        return { 'foo': 'bar' }
+        source_xml = self.grab_inscription( file_id )
+        initial_solr_doc = self.make_initial_solr_doc( source_xml )
+        statused_solr_doc = self.update_status( display_status, initial_solr_doc )
+        return statused_solr_doc
 
     def determine_display_status( self, file_id, status_json ):
         """ Returns display_status
@@ -161,6 +164,21 @@ class Prepper( object ):
             display_status = 'to_approve'
         log.debug( 'display_status, `{}`'.format(display_status) )
         return display_status
+
+    def grab_inscription( file_id ):
+        """ Returns inscription xml.
+            Called by make_solr_data() """
+        return 'foo'
+
+    def make_initial_solr_doc( self, source_xml ):
+        """ Returns result of xsl transform.
+            Called by make_solr_data() """
+        return 'foo2'
+
+    def update_status( self, display_status, initial_solr_doc ):
+        """ Updates solr doc with display-status.
+            Called by make_solr_data() """
+        return 'foo3'
 
     ## end class Prepper()
 
@@ -204,15 +222,16 @@ def run_prep_file( file_id, status_json ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
     log.debug( 'file_id, ```{}```'.format(file_id) )
-    prepared_solr_data = prepper.make_solr_data( file_id, status_json )
+    xml_solr_doc = prepper.make_solr_data( file_id, status_json )
     log.debug( 'enqueuing next job' )
     q.enqueue_call(
-        func=u'iip_processing_app.lib.processor.run_update_index',
-        kwargs={u'prepared_solr_data': prepared_solr_data} )
+        func='iip_processing_app.lib.processor.run_update_index',
+        kwargs={'xml_solr_doc': xml_solr_doc} )
 
-def run_update_index( prepared_solr_data ):
+def run_update_index( xml_solr_doc ):
     """ Updates index with new or changed info.
         Called by run_prep_file() """
+    log.debug( 'partial xml_solr_doc, ```{}```'.format(xml_solr_doc[0:100]) )
     log.debug( 'call to index-file class/function will go here' )
     log.debug( 'done processing file' )
 
