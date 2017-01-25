@@ -181,9 +181,10 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             func=u'iip_processing_app.lib.processor.run_remove_file_from_index',
             kwargs={u'file_to_remove': file_to_remove} )
 
-def run_process_file( file_to_update ):
+def run_prep_file( file_to_update ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
+    log.debug( 'file_to_update, ```{}```'.format(file_to_update) )
     log.debug( 'call to process-file class/function will go here' )
     file_to_update_data = {'foo': 'bar'}
     log.debug( 'enqueuing next job' )
@@ -193,7 +194,7 @@ def run_process_file( file_to_update ):
 
 def run_update_index( file_to_update_data ):
     """ Updates index with new or changed info.
-        Called by run_process_file() """
+        Called by run_prep_file() """
     log.debug( 'call to index-file class/function will go here' )
     log.debug( 'done processing file' )
 
