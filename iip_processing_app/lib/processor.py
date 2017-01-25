@@ -141,8 +141,9 @@ class Prepper( object ):
     def __init__( self ):
         pass
 
-    def check_if_new( self ):
-        existing_solr_inscri
+    def make_solr_data( self ):
+        """ Manages preparation of solr data.
+            Called by run_prep_file() """
         pass
 
     ## end class Prepper()
