@@ -118,7 +118,7 @@ class ProcessorTest(TestCase):
         ## call processor.run_call_git_pull( to_process_dct )
         to_process_dct = {
             u'files_removed': [],
-            u'files_updated': [u'abur0001.xml'],
+            u'files_updated': ['abur0001'],
             u'timestamp': u'2017-01-24 09:52:38.911009' }
         processor.run_call_git_pull( to_process_dct )
         ##
