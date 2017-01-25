@@ -135,7 +135,16 @@ class StatusBackupper( object ):
     ## end class StatusBackupper()
 
 
+class Prepper( object ):
+    """ Manages prep for solr post. """
 
+    def __init__( self ):
+        pass
+
+    def check_if_new( self ):
+        pass
+
+    ## end class Prepper()
 
 
 ## runners ##
