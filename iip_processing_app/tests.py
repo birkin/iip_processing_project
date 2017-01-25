@@ -93,6 +93,7 @@ class ProcessorTest(TestCase):
 
     def setUp(self):
         self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+        self.xml_dir = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
 
     def test_call_git_pull(self):
         """ Checks for successful pull. """
@@ -130,3 +131,15 @@ class ProcessorTest(TestCase):
             if job.origin == self.queue_name:
                 failed_count += 1
         self.assertEqual( 0, failed_count )
+
+    def test_transform_xml(self):
+        """ Checks transform. """
+        filepath = '{}/abur0001.xml'.format( self.xml_dir )
+        with open( filepath ) as f:
+            xml_utf8 = f.read()
+        source_xml = xml_utf8.decode( 'utf-8' )
+        self.assertEqual(
+            'foo',
+            prepper.make_initial_solr_doc( source_xml )
+            )
+
