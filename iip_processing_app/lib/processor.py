@@ -10,7 +10,6 @@ Contains:
 
 import datetime, json, logging, logging.config, os, pprint, shutil, time
 import envoy, redis, requests, rq
-from django.conf import settings as project_settings
 from lxml import etree
 
 
