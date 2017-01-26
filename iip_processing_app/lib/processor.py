@@ -11,6 +11,7 @@ Contains:
 import datetime, json, logging, logging.config, os, pprint, shutil, time
 import envoy, redis, requests, rq
 from django.conf import settings as project_settings
+from lxml import etree
 
 
 log = logging.getLogger(__name__)
@@ -193,10 +194,18 @@ class Prepper( object ):
         log.debug( 'transformed_xml, ```{}```'.format(transformed_xml) )
         return transformed_xml
 
-    def update_status( self, display_status, initial_solr_doc ):
-        """ Updates solr doc with display-status.
+    def update_status( self, display_status, initial_solr_xml ):
+        """ Updates initial solr-xml with display-status.
             Called by make_solr_data() """
-        return 'foo3'
+        doc = etree.fromstring( initial_solr_xml.encode('utf-8') )  # can't take unicode string due to xml file's encoding declaration
+        node = doc.xpath( '//doc' )[0]
+        new_field = etree.SubElement( node, 'field' )
+        new_field.attrib['name'] = 'display_status'
+        new_field.text = display_status
+        utf8_xml = etree.tostring( doc, encoding='UTF-8', xml_declaration=True, pretty_print=False )
+        statused_xml = utf8_xml.decode( 'utf-8' )
+        log.debug( 'statused_xml, ```{}```'.format(statused_xml) )
+        return statused_xml
 
     ## end class Prepper()
 
