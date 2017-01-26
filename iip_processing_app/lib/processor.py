@@ -284,10 +284,9 @@ def run_update_index_file( solr_xml ):
         Called by run_prep_file() """
     log.debug( 'partial solr_xml, ```{}```'.format(solr_xml[0:100]) )
     indexer.update_file( solr_xml )
-    log.debug( 'call to index-file class/function will go here' )
     log.debug( 'done processing file' )
 
-def run_remove_index_file( files_to_remove ):
+def run_remove_index_file( file_to_remove ):
     """ Removes file from index.
         Called by run_backup_statuses() """
     log.debug( 'call to remove-from-index class/function will go here' )
