@@ -168,10 +168,10 @@ class Prepper( object ):
         log.debug( 'display_status, `{}`'.format(display_status) )
         return display_status
 
-    def grab_inscription( file_id ):
+    def grab_inscription( self, file_id ):
         """ Returns inscription xml.
             Called by make_solr_data() """
-        filepath = '{dir}/{file_id}.xml'.format( dir=self.XML_DIR, file_id=file_id )
+        filepath = '{dir}/epidoc-files/{file_id}.xml'.format( dir=self.XML_DIR, file_id=file_id )
         with open( filepath ) as f:
             xml_utf8 = f.read()
         xml = xml_utf8.decode( 'utf-8' )
