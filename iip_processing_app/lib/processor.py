@@ -209,12 +209,25 @@ class Prepper( object ):
     ## end class Prepper()
 
 
+class Indexer( object ):
+    """ Manages solr calls. """
+
+    def __init__( self ):
+        pass
+
+    def update_file( self, solr_xml ):
+        """ Posts xml doc to solr.
+            Called by run_update_index_file() """
+        return 'foo'
+
+
 ## runners ##
 
 q = rq.Queue( u'iip_prc', connection=redis.Redis() )
 puller = Puller()
 backupper = StatusBackupper()
 prepper = Prepper()
+indexer = Indexer()
 
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
@@ -241,27 +254,28 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             kwargs={'file_id': file_to_update, 'status_json': status_json} )
     for file_to_remove in files_to_remove:
         q.enqueue_call(
-            func='iip_processing_app.lib.processor.run_remove_file_from_index',
+            func='iip_processing_app.lib.processor.run_remove_index_file',
             kwargs={'file_to_remove': file_to_remove} )
 
 def run_prep_file( file_id, status_json ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
     log.debug( 'file_id, ```{}```'.format(file_id) )
-    xml_solr_doc = prepper.make_solr_data( file_id, status_json )
+    solr_xml = prepper.make_solr_data( file_id, status_json )
     log.debug( 'enqueuing next job' )
     q.enqueue_call(
-        func='iip_processing_app.lib.processor.run_update_index',
-        kwargs={'xml_solr_doc': xml_solr_doc} )
+        func='iip_processing_app.lib.processor.run_update_index_file',
+        kwargs={'solr_xml': solr_xml} )
 
-def run_update_index( xml_solr_doc ):
+def run_update_index_file( solr_xml ):
     """ Updates index with new or changed info.
         Called by run_prep_file() """
-    log.debug( 'partial xml_solr_doc, ```{}```'.format(xml_solr_doc[0:100]) )
+    log.debug( 'partial solr_xml, ```{}```'.format(solr_xml[0:100]) )
+    indexer.update_file( solr_xml )
     log.debug( 'call to index-file class/function will go here' )
     log.debug( 'done processing file' )
 
-def run_remove_file_from_index( files_to_remove ):
+def run_remove_index_file( files_to_remove ):
     """ Removes file from index.
         Called by run_backup_statuses() """
     log.debug( 'call to remove-from-index class/function will go here' )
