@@ -9,7 +9,7 @@ Contains:
 """
 
 import datetime, json, logging, logging.config, os, pprint, shutil, time
-import envoy, redis, requests, rq
+import envoy, redis, requests, rq, solr
 from lxml import etree
 
 
@@ -215,7 +215,7 @@ class Indexer( object ):
     def __init__( self ):
         self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
 
-    def update_file( self, solr_xml ):
+    def update_entry( self, solr_xml ):
         """ Posts xml to solr.
             Called by run_update_index_file() """
         update_url = '{}/update/?commit=true'.format( self.SOLR_URL )
@@ -227,6 +227,15 @@ class Indexer( object ):
             'response_status_code': r.status_code, 'response_text': r.content.decode('utf-8') }
         log.debug( 'solr response result_dct, ```{}```'.format(pprint.pformat(result_dct)) )
         return result_dct
+
+    def delete_entry( self, file_id ):
+        log.debug( 'file_id, `{}`'.format(file_id) )
+        s = solr.Solr( self.SOLR_URL )
+        response = s.delete( file_id )
+        s.commit()
+        s.close()
+        log.debug( 'deletion-post complete; response, ```{}```'.format(response) )
+        return
 
     ## end class Indexer()
 
@@ -263,7 +272,7 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     for file_to_remove in files_to_remove:
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_remove_index_file',
-            kwargs={'file_to_remove': file_to_remove} )
+            kwargs={'file_id': file_to_remove} )
     for file_to_update in files_to_update:
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_prep_file',
@@ -279,15 +288,17 @@ def run_prep_file( file_id, status_json ):
         func='iip_processing_app.lib.processor.run_update_index_file',
         kwargs={'solr_xml': solr_xml} )
 
+def run_remove_index_file( file_id ):
+    """ Removes file from index.
+        Called by run_backup_statuses() """
+    log.debug( 'file_id, ```{}```'.format(file_id) )
+    indexer.delete_entry( file_id )
+    log.debug( 'done processing file' )
+
 def run_update_index_file( solr_xml ):
     """ Updates index with new or changed info.
         Called by run_prep_file() """
     log.debug( 'partial solr_xml, ```{}```'.format(solr_xml[0:100]) )
-    indexer.update_file( solr_xml )
+    indexer.update_entry( solr_xml )
     log.debug( 'done processing file' )
 
-def run_remove_index_file( file_to_remove ):
-    """ Removes file from index.
-        Called by run_backup_statuses() """
-    log.debug( 'call to remove-from-index class/function will go here' )
-    log.debug( 'done processing file' )
