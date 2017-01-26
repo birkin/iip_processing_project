@@ -141,6 +141,8 @@ class Prepper( object ):
     def __init__( self ):
         self.XML_DIR = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
         self.STYLESHEET_PATH = unicode( os.environ['IIP_PRC__SOLR_DOC_STYLESHEET_PATH'] )
+        self.TRANSFORMER_URL = unicode( os.environ['IIP_PRC__TRANSFORMER_URL'] )
+        self.TRANSFORMER_AUTH_KEY = unicode( os.environ['IIP_PRC__TRANSFORMER_AUTH_KEY'] )
 
     def make_solr_data( self, file_id, status_json ):
         """ Manages preparation of solr data.
