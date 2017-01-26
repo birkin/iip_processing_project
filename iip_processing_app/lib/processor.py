@@ -212,15 +212,15 @@ def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
             Eventually spawns a call to indexer.run_update_index() which handles each result found.
         Called by views.gh_inscription_watcher(). """
-    assert sorted( to_process_dct.keys() ) == [ 'files_removed', 'files_updated', 'timestamp']
-    log.debug( 'to_process_dct, ```{}```'.format(pprint.pformat(to_process_dct)) )
+    log.debug( 'to_process_dct, ```{}```'.format(pprint.pformat(to_process_dct)) )  # keys: [ 'files_removed', 'files_updated', 'timestamp']
     time.sleep( 2 )  # let any existing in-process pull finish
-    puller = Puller()
     puller.call_git_pull()
-    log.debug( 'enqueuing next job' )
-    q.enqueue_call(
-        func=u'iip_processing_app.lib.processor.run_backup_statuses',
-        kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
+    if to_process_dct['files_updated'] or to_process_dct['files_removed']:
+        q.enqueue_call(
+            func=u'iip_processing_app.lib.processor.run_backup_statuses',
+            kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
+    else:
+        log.debug( 'no files to update; done' )
     return
 
 def run_backup_statuses( files_to_update, files_to_remove ):
