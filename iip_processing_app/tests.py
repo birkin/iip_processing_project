@@ -6,13 +6,14 @@ import redis, rq
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
 from iip_processing_app.lib import processor
-from iip_processing_app.lib.processor import Puller
+from iip_processing_app.lib.processor import Prepper, Puller
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
 puller = Puller()
+prepper = Prepper()
 
 
 class RootUrlTest(TestCase):
@@ -134,12 +135,13 @@ class ProcessorTest(TestCase):
 
     def test_transform_xml(self):
         """ Checks transform. """
-        filepath = '{}/abur0001.xml'.format( self.xml_dir )
+        filepath = '{}/epidoc-files/abur0001.xml'.format( self.xml_dir )
         with open( filepath ) as f:
             xml_utf8 = f.read()
         source_xml = xml_utf8.decode( 'utf-8' )
+        unicode_doc = prepper.make_initial_solr_doc( source_xml )
         self.assertEqual(
-            'foo',
-            prepper.make_initial_solr_doc( source_xml )
+            True,
+            u'Κύριε' in unicode_doc,
             )
 
