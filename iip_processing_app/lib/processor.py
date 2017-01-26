@@ -213,12 +213,22 @@ class Indexer( object ):
     """ Manages solr calls. """
 
     def __init__( self ):
-        pass
+        self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
 
     def update_file( self, solr_xml ):
-        """ Posts xml doc to solr.
+        """ Posts xml to solr.
             Called by run_update_index_file() """
-        return 'foo'
+        update_url = '{}/update/?commit=true'.format( self.SOLR_URL )
+        log.debug( 'solr update url, ```{}```'.format(update_url) )
+        headers = { 'content-type'.encode('utf-8'): 'text/xml; charset=utf-8'.encode('utf-8') }  # from testing, NON-unicode-string posts were bullet-proof
+        r = requests.post(
+            update_url.encode(u'utf-8'), headers=headers, data=solr_xml.encode('utf-8') )
+        result_dct = {
+            'response_status_code': r.status_code, 'response_text': r.content.decode('utf-8') }
+        log.debug( 'solr response result_dct, ```{}```'.format(pprint.pformat(result_dct)) )
+        return result_dct
+
+    ## end class Indexer()
 
 
 ## runners ##
