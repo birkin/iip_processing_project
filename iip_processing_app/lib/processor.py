@@ -280,6 +280,13 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             func='iip_processing_app.lib.processor.run_prep_file',
             kwargs={'file_id': file_to_update, 'status_json': status_json} )
 
+def run_remove_index_file( file_id ):
+    """ Removes file from index.
+        Called by run_backup_statuses() """
+    log.debug( 'file_id, ```{}```'.format(file_id) )
+    indexer.delete_entry( file_id )
+    log.debug( 'done processing file' )
+
 def run_prep_file( file_id, status_json ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
@@ -290,17 +297,9 @@ def run_prep_file( file_id, status_json ):
         func='iip_processing_app.lib.processor.run_update_index_file',
         kwargs={'solr_xml': solr_xml} )
 
-def run_remove_index_file( file_id ):
-    """ Removes file from index.
-        Called by run_backup_statuses() """
-    log.debug( 'file_id, ```{}```'.format(file_id) )
-    indexer.delete_entry( file_id )
-    log.debug( 'done processing file' )
-
 def run_update_index_file( solr_xml ):
     """ Updates index with new or changed info.
         Called by run_prep_file() """
     log.debug( 'partial solr_xml, ```{}```'.format(solr_xml[0:100]) )
     indexer.update_entry( solr_xml )
     log.debug( 'done processing file' )
-
