@@ -61,11 +61,11 @@ class GHHelper( object ):
     def prep_files_to_process( self, commits_lst ):
         """ Prepares the data-dict to be sent to the first rq job.
             Called by handle_inscription_update() """
-        files_to_process = { u'files_updated': [], u'files_removed': [], u'timestamp': unicode(datetime.datetime.now()) }
+        files_to_process = { 'files_updated': [], 'files_removed': [], 'timestamp': unicode(datetime.datetime.now()) }
         ( added, modified, removed ) = self.examine_commits( commits_lst )
-        files_to_process[u'files_updated'] = added
-        files_to_process[u'files_updated'].extend( modified )  # solrization same for added or modified
-        files_to_process[u'files_removed'] = removed
+        files_to_process['files_updated'] = added
+        files_to_process['files_updated'].extend( modified )  # solrization same for added or modified
+        files_to_process['files_removed'] = removed
         log.debug( 'files_to_process, ```{}```'.format(pprint.pformat(files_to_process)) )
         return files_to_process
 
@@ -74,9 +74,9 @@ class GHHelper( object ):
             Called by prep_files_to_process(). """
         ( added, modified, removed ) = ( [], [], [] )
         for commit in commits_lst:
-            added.extend( commit[u'added'] )
-            modified.extend( commit[u'modified'] )
-            removed.extend( commit[u'removed'] )
+            added.extend( commit['added'] )
+            modified.extend( commit['modified'] )
+            removed.extend( commit['removed'] )
         cleaned_added = sorted( self.clean_list(added) )
         cleaned_modified = sorted( self.clean_list(modified) )
         cleaned_removed = sorted( self.clean_list(removed) )
