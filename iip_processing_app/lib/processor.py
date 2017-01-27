@@ -268,7 +268,7 @@ def run_call_git_pull( to_process_dct ):
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull()
-        Note: Files to remove must be enqueued first.
+        Note: Files to remove will be enqueued first.
               This will properly handle a file that is removed, then re-added. """
     status_json = backupper.make_backup()
     for file_to_remove in files_to_remove:
