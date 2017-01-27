@@ -150,6 +150,7 @@ LOGGING = {
         'iip_processing_app': {
             'handlers': ['logfile'],
             'level': os.environ.get(u'IIP_PRC__LOG_LEVEL'),
+            'propagate': False
         },
     }
 }
