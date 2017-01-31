@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 """ Contains travis-ci.org friendly tests. """
 
 import json, logging, os, time
+import base64
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
 from iip_processing_app.lib.processor import Prepper
@@ -18,6 +19,9 @@ prepper = Prepper()
 
 class RootUrlTest(TestCase):
     """ Checks root urls. """
+
+    def setUp(self):
+        pass
 
     def test_root_url_no_slash(self):
         """ Checks '/root_url'. """
@@ -38,20 +42,24 @@ class HBAuthParserTest(TestCase):
     """ Checks parsing of http-basic-auth incoming info. """
 
     def setUp(self):
-        self.test_hbauth_header = os.environ['IIP_PRC__TEST_HTTP_BASIC_AUTH_HEADER'].decode( 'utf-8' )
-        self.hbauth_good_username = os.environ['IIP_PRC__BASIC_AUTH_USERNAME'].decode( 'utf-8' )
-        self.hbauth_good_password = os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'].decode( 'utf-8' )
+        pass
 
     def test_legit_info(self):
         """ Checks parsing of username and password. """
+        encoded_string = base64.encodestring( '{usrnm}:{psswd}'.format(usrnm='username_foo', psswd='password_bar') ).replace( '\n', '' )
+        basic_auth_string = 'Basic {}'.format( encoded_string )
+        log.debug( 'basic_auth_string, ```{}```'.format(basic_auth_string) )
         self.assertEqual(
-            { 'received_username': self.hbauth_good_username, 'received_password': self.hbauth_good_password },
-            gh_helper.parse_http_basic_auth( self.test_hbauth_header )
+            { 'received_username': 'username_foo', 'received_password': 'password_bar' },
+            gh_helper.parse_http_basic_auth( basic_auth_string )
             )
 
 
 class GitHubResponseParseTest(TestCase):
     """ Checks github response parsing. """
+
+    def setUp(self):
+        pass
 
     def test_examine_commits(self):
         """ Checks extraction of files to process. """
@@ -83,7 +91,6 @@ class GitHubResponseParseTest(TestCase):
             }
           ]''')
         self.assertEqual(
-            # ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
             ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
             gh_helper.examine_commits( commits_list )
             )
