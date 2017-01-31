@@ -5,14 +5,16 @@ from __future__ import unicode_literals
 """ Contains tests for git-pulls and rq processing. """
 
 import json, logging, os, time
-import redis, rq
+import redis, requests, rq
 from django.test import TestCase
 from iip_processing_app.lib import processor
+from iip_processing_app.lib.processor import Prepper
 from iip_processing_app.lib.processor import Puller
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
+prepper = Prepper()
 puller = Puller()
 
 
@@ -21,6 +23,19 @@ class PrepperOtherTest(TestCase):
 
     def setUp(self):
         self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+
+    def test_transform_xml(self):
+        """ Checks transform.
+            TODO: think about how to call the xsl_transformer url and move this test back to tests_unit.py """
+        url = 'https://apps.library.brown.edu/iip/inscriptions/epidoc-files/abur0001.xml'
+        r = requests.get( url )
+        xml_utf8 = r.content
+        source_xml = xml_utf8.decode( 'utf-8' )
+        unicode_doc = prepper.make_initial_solr_doc( source_xml )
+        self.assertEqual(
+            True,
+            u'Κύριε' in unicode_doc,
+            )
 
     def test_call_git_pull(self):
         """ Checks for successful pull. """

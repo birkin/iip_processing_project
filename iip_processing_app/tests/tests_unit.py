@@ -102,18 +102,6 @@ class PrepperUnitTest(TestCase):
     def setUp(self):
         self.xml_dir = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
 
-    def test_transform_xml(self):
-        """ Checks transform. """
-        url = 'https://apps.library.brown.edu/iip/inscriptions/epidoc-files/abur0001.xml'
-        r = requests.get( url )
-        xml_utf8 = r.content
-        source_xml = xml_utf8.decode( 'utf-8' )
-        unicode_doc = prepper.make_initial_solr_doc( source_xml )
-        self.assertEqual(
-            True,
-            u'Κύριε' in unicode_doc,
-            )
-
     def test_update_status(self):
         """ Checks addition of display_status. """
         display_status = 'foo'
