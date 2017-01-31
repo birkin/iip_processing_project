@@ -50,43 +50,43 @@ prepper = Prepper()
 #             )
 
 
-class GitHubResponseTest(TestCase):
-    """ Checks github response parsing. """
+# class GitHubResponseTest(TestCase):
+#     """ Checks github response parsing. """
 
-    def test_examine_commits(self):
-        """ Checks extraction of files to process. """
-        commits_list = json.loads('''[
-            {
-              "added": [],
-              "author": {
-                "email": "birkin.diana@gmail.com",
-                "name": "Birkin James Diana",
-                "username": "birkin"
-              },
-              "committer": {
-                "email": "noreply@github.com",
-                "name": "GitHub",
-                "username": "web-flow"
-              },
-              "distinct": true,
-              "id": "88cb3c31a7bcec4adc0558fbff74347d0a9245e1",
-              "message": "test commit of comment.",
-              "modified": [
-                "epidoc-files/abur0001.xml",
-                "blah",
-                "epidoc-files/aaa123.xml"
-              ],
-              "removed": [],
-              "timestamp": "2017-01-19T11:00:30-05:00",
-              "tree_id": "e45afe1e50d17e94e9bc2a26a35f4b3f3457bb55",
-              "url": "https://github.com/Brown-University-Library/iip-texts/commit/88cb3c31a7bcec4adc0558fbff74347d0a9245e1"
-            }
-          ]''')
-        self.assertEqual(
-            # ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
-            ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
-            gh_helper.examine_commits( commits_list )
-            )
+#     def test_examine_commits(self):
+#         """ Checks extraction of files to process. """
+#         commits_list = json.loads('''[
+#             {
+#               "added": [],
+#               "author": {
+#                 "email": "birkin.diana@gmail.com",
+#                 "name": "Birkin James Diana",
+#                 "username": "birkin"
+#               },
+#               "committer": {
+#                 "email": "noreply@github.com",
+#                 "name": "GitHub",
+#                 "username": "web-flow"
+#               },
+#               "distinct": true,
+#               "id": "88cb3c31a7bcec4adc0558fbff74347d0a9245e1",
+#               "message": "test commit of comment.",
+#               "modified": [
+#                 "epidoc-files/abur0001.xml",
+#                 "blah",
+#                 "epidoc-files/aaa123.xml"
+#               ],
+#               "removed": [],
+#               "timestamp": "2017-01-19T11:00:30-05:00",
+#               "tree_id": "e45afe1e50d17e94e9bc2a26a35f4b3f3457bb55",
+#               "url": "https://github.com/Brown-University-Library/iip-texts/commit/88cb3c31a7bcec4adc0558fbff74347d0a9245e1"
+#             }
+#           ]''')
+#         self.assertEqual(
+#             # ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
+#             ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
+#             gh_helper.examine_commits( commits_list )
+#             )
 
 
 class PrepperTest(TestCase):
