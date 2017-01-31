@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 
 """ Contains travis-ci.org friendly tests. """
 
-import json, logging, os, time
-import base64
+import base64, json, logging, os, time
+import requests
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
 from iip_processing_app.lib.processor import Prepper
@@ -104,9 +104,9 @@ class PrepperUnitTest(TestCase):
 
     def test_transform_xml(self):
         """ Checks transform. """
-        filepath = '{}/epidoc-files/abur0001.xml'.format( self.xml_dir )
-        with open( filepath ) as f:
-            xml_utf8 = f.read()
+        url = 'https://apps.library.brown.edu/iip/inscriptions/epidoc-files/abur0001.xml'
+        r = requests.get( url )
+        xml_utf8 = r.content
         source_xml = xml_utf8.decode( 'utf-8' )
         unicode_doc = prepper.make_initial_solr_doc( source_xml )
         self.assertEqual(
