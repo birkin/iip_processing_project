@@ -1,23 +1,27 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import json, logging, os, time
-import redis, rq
+
+""" Contains travis-ci.org friendly tests. """
+
+import base64, json, logging, os, time
+import requests
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
-from iip_processing_app.lib import processor
-from iip_processing_app.lib.processor import Prepper, Puller
+from iip_processing_app.lib.processor import Prepper
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
-puller = Puller()
 prepper = Prepper()
 
 
 class RootUrlTest(TestCase):
     """ Checks root urls. """
+
+    def setUp(self):
+        pass
 
     def test_root_url_no_slash(self):
         """ Checks '/root_url'. """
@@ -38,20 +42,24 @@ class HBAuthParserTest(TestCase):
     """ Checks parsing of http-basic-auth incoming info. """
 
     def setUp(self):
-        self.test_hbauth_header = os.environ['IIP_PRC__TEST_HTTP_BASIC_AUTH_HEADER'].decode( 'utf-8' )
-        self.hbauth_good_username = os.environ['IIP_PRC__BASIC_AUTH_USERNAME'].decode( 'utf-8' )
-        self.hbauth_good_password = os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'].decode( 'utf-8' )
+        pass
 
     def test_legit_info(self):
         """ Checks parsing of username and password. """
+        encoded_string = base64.encodestring( '{usrnm}:{psswd}'.format(usrnm='username_foo', psswd='password_bar') ).replace( '\n', '' )
+        basic_auth_string = 'Basic {}'.format( encoded_string )
+        log.debug( 'basic_auth_string, ```{}```'.format(basic_auth_string) )
         self.assertEqual(
-            { 'received_username': self.hbauth_good_username, 'received_password': self.hbauth_good_password },
-            gh_helper.parse_http_basic_auth( self.test_hbauth_header )
+            { 'received_username': 'username_foo', 'received_password': 'password_bar' },
+            gh_helper.parse_http_basic_auth( basic_auth_string )
             )
 
 
-class GitHubResponseTest(TestCase):
+class GitHubResponseParseTest(TestCase):
     """ Checks github response parsing. """
+
+    def setUp(self):
+        pass
 
     def test_examine_commits(self):
         """ Checks extraction of files to process. """
@@ -83,67 +91,16 @@ class GitHubResponseTest(TestCase):
             }
           ]''')
         self.assertEqual(
-            # ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
             ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
             gh_helper.examine_commits( commits_list )
             )
 
 
-class PrepperTest(TestCase):
-    """ Checks processor.py functions. """
+class PrepperUnitTest(TestCase):
+    """ Checks travis-friendly processor.py functions. """
 
     def setUp(self):
-        self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
         self.xml_dir = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
-
-    def test_call_git_pull(self):
-        """ Checks for successful pull. """
-        self.assertEqual(
-            0,  # 0 means no problems; 1 means a problem
-            puller.call_git_pull()
-            )
-
-    def test_run_call_git_pull(self):
-        """ Triggers processing; checks for no failed jobs. """
-        ## confirm no processing jobs running
-        q = rq.Queue( self.queue_name, connection=redis.Redis() )
-        self.assertEqual( 0, len(q.jobs) )
-        ##
-        ## confirm no processing failed jobs
-        failed_queue = rq.queue.get_failed_queue( connection=redis.Redis() )
-        failed_count = 0
-        for job in failed_queue.jobs:
-            if job.origin == self.queue_name:
-                failed_count += 1
-        self.assertEqual( 0, failed_count )
-        ##
-        ## call processor.run_call_git_pull( to_process_dct )
-        to_process_dct = {
-            u'files_removed': [],
-            u'files_updated': ['abur0001'],
-            u'timestamp': u'2017-01-24 09:52:38.911009' }
-        processor.run_call_git_pull( to_process_dct )
-        ##
-        ## confirm no processing failed jobs
-        time.sleep( 2 )
-        failed_queue = rq.queue.get_failed_queue( connection=redis.Redis() )
-        failed_count = 0
-        for job in failed_queue.jobs:
-            if job.origin == self.queue_name:
-                failed_count += 1
-        self.assertEqual( 0, failed_count )
-
-    def test_transform_xml(self):
-        """ Checks transform. """
-        filepath = '{}/epidoc-files/abur0001.xml'.format( self.xml_dir )
-        with open( filepath ) as f:
-            xml_utf8 = f.read()
-        source_xml = xml_utf8.decode( 'utf-8' )
-        unicode_doc = prepper.make_initial_solr_doc( source_xml )
-        self.assertEqual(
-            True,
-            u'Κύριε' in unicode_doc,
-            )
 
     def test_update_status(self):
         """ Checks addition of display_status. """
