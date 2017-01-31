@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import json, logging, os, time
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
+from iip_processing_app.lib.processor import Prepper
 # from iip_processing_app.lib import processor
 # from iip_processing_app.lib.processor import Prepper, Puller
 
@@ -12,7 +13,7 @@ log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
 # puller = Puller()
-# prepper = Prepper()
+prepper = Prepper()
 
 
 class RootUrlTest(TestCase):
@@ -85,4 +86,24 @@ class GitHubResponseParseTest(TestCase):
             # ( [], [u'aaa123.xml', u'abur0001.xml'], [] ),  # added, modified, removed
             ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
             gh_helper.examine_commits( commits_list )
+            )
+
+
+class PrepperTest(TestCase):
+    """ Checks processor.py functions. """
+
+    def setUp(self):
+        self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+        self.xml_dir = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
+
+    def test_transform_xml(self):
+        """ Checks transform. """
+        filepath = '{}/epidoc-files/abur0001.xml'.format( self.xml_dir )
+        with open( filepath ) as f:
+            xml_utf8 = f.read()
+        source_xml = xml_utf8.decode( 'utf-8' )
+        unicode_doc = prepper.make_initial_solr_doc( source_xml )
+        self.assertEqual(
+            True,
+            u'Κύριε' in unicode_doc,
             )

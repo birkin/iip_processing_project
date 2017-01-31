@@ -133,17 +133,17 @@ class PrepperTest(TestCase):
                 failed_count += 1
         self.assertEqual( 0, failed_count )
 
-    def test_transform_xml(self):
-        """ Checks transform. """
-        filepath = '{}/epidoc-files/abur0001.xml'.format( self.xml_dir )
-        with open( filepath ) as f:
-            xml_utf8 = f.read()
-        source_xml = xml_utf8.decode( 'utf-8' )
-        unicode_doc = prepper.make_initial_solr_doc( source_xml )
-        self.assertEqual(
-            True,
-            u'Κύριε' in unicode_doc,
-            )
+    # def test_transform_xml(self):
+    #     """ Checks transform. """
+    #     filepath = '{}/epidoc-files/abur0001.xml'.format( self.xml_dir )
+    #     with open( filepath ) as f:
+    #         xml_utf8 = f.read()
+    #     source_xml = xml_utf8.decode( 'utf-8' )
+    #     unicode_doc = prepper.make_initial_solr_doc( source_xml )
+    #     self.assertEqual(
+    #         True,
+    #         u'Κύριε' in unicode_doc,
+    #         )
 
     def test_update_status(self):
         """ Checks addition of display_status. """
