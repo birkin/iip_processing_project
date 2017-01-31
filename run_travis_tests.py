@@ -10,9 +10,9 @@ from django.test.utils import get_runner
 
 if __name__ == '__main__':
     os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings_travis'
-    os.environ['foo'] = 'bar'
+    os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] = 'foo'
     django.setup()
     TestRunner = get_runner(settings)
     test_runner = TestRunner()
-    failures = test_runner.run_tests(['iip_processing_app.tests'])
+    failures = test_runner.run_tests(['iip_processing_app.tests.tests_unit'])
     sys.exit(bool(failures))
