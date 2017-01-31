@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+
+""" Contains travis-ci.org friendly tests. """
+
 import json, logging, os, time
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper
 from iip_processing_app.lib.processor import Prepper
-# from iip_processing_app.lib import processor
-# from iip_processing_app.lib.processor import Prepper, Puller
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
-# puller = Puller()
 prepper = Prepper()
 
 
@@ -89,11 +89,10 @@ class GitHubResponseParseTest(TestCase):
             )
 
 
-class PrepperTest(TestCase):
-    """ Checks processor.py functions. """
+class PrepperUnitTest(TestCase):
+    """ Checks travis-friendly processor.py functions. """
 
     def setUp(self):
-        self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
         self.xml_dir = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
 
     def test_transform_xml(self):
@@ -106,4 +105,52 @@ class PrepperTest(TestCase):
         self.assertEqual(
             True,
             u'Κύριε' in unicode_doc,
+            )
+
+    def test_update_status(self):
+        """ Checks addition of display_status. """
+        display_status = 'foo'
+        initial_solr_xml = '''<?xml version="1.0" encoding="UTF-8"?><add><doc><field name="inscription_id">abur0001</field><field name="region">Judaea</field><field name="city">Bethennim</field><field name="placeMenu">Bethennim  (Judaea)</field><field name="placeMenu">Judaea</field><field name="place_found">[Bethennim, Judaea. Room A in church. ]
+Judaea. Bethennim (Khirbet Abu Rish), in the church complex, Room A.
+</field><field name="notAfter">0700</field><field name="notBefore">0300</field><field name="type">invocation</field><field name="language">grc</field><field name="language_display">Greek</field><field name="religion">christian</field><field name="physical_type">mosaic</field><field name="figure_desc">square mosaic</field><field name="transcription">&lt;span&gt;
+
+               Κύριε
+               [
+                  Ἰησοῦ
+                  Χριστέ μνήσθητ]ι &lt;br/&gt;το[ῦ δούλου σου [-----]
+               ]ά&lt;br/&gt;λα[-----]
+               [τοῦ]
+               &lt;br/&gt;πρε[σβυτέρου καί π]άν-&lt;br/&gt;των [τῶν π]ροσκυ-&lt;br/&gt;νούντων ἐν τῴ&lt;br/&gt;τόπῳ τούτῳ καί&lt;br/&gt;τῶν καρποφο-&lt;br/&gt;ρούντων ἐν τῷ&lt;br/&gt;τόπῳ τούτῳ
+
+&lt;/span&gt;
+
+    </field><field name="transcription_search">
+
+               Κε Κύριε
+
+                  Ἰῦ Ἰησοῦ
+                  Χέ Χριστέ μνήσθητι τοῦ δούλου σου
+               άλα
+               τοῦ
+               πρεσβυτέρου καί πάν-των τῶν προσκυ-νούντων ἐν τῴτόπῳ τούτῳ καίτῶν καρποφο-ρούντων ἐν τῷτόπῳ τούτῳ
+         </field><field name="translation">Lord Jesus Christ [remember your servant ...] the priest and all the pilgrims to
+                    this place [or: all those who pray in this place] and those who contribute to
+                    this place.</field><field name="translation_search">
+            Lord Jesus Christ [remember your servant ...] the priest and all the pilgrims to
+                    this place [or: all those who pray in this place] and those who contribute to
+                    this place.
+         </field><field name="diplomatic">&lt;span&gt;
+            ΚΕ [ΙΥ ΧΕ ΜΝΗΣΘΗΤ]Ι&lt;br/&gt;ΤΟ[Υ ΔΟΥΛΟΥ ΣΟΥ] Α&lt;br/&gt;ΛΑ [-----]
+               [ΤΟΥ]
+               &lt;br/&gt;ΠΡΕ[ΣΒΥΤΕΡΟΥ ΚΑΙ Π]ΑΝ-&lt;br/&gt;ΤΩΝ [ΤΩΝ Π]ΡΟΣΚΥ-&lt;br/&gt;ΝΟΥΝΤΩΝ ΕΝ ΤΩ&lt;br/&gt;ΤΟΠΩ ΤΟΥΤΩ ΚΑΙ&lt;br/&gt;ΤΩΝ ΚΑΡΠΟΦΟ-&lt;br/&gt;ΡΟΥΝΤΩΝ ΕΝ ΤΩ&lt;br/&gt;ΤΟΠΩ ΤΟΥΤΩ
+
+&lt;/span&gt;
+
+    </field><field name="dimensions">h: 1 m; w: 1 m; d: unknown; let: N/A</field><field name="bibl">bibl=IIP-487.xml|nType=page|n=147-148</field><field name="bibl">bibl=IIP-544.xml|nType=page|n=339-358</field><field name="biblDiplomatic">bibl=IIP-487.xml|nType=page|n=147-148</field><field name="biblTranscription">bibl=IIP-487.xml|nType=page|n=147-148</field><field name="biblTranslation">bibl=IIP-487.xml|nType=page|n=147-148</field><field name="short_description">Bethennim (Khirbet Abu Rish). 300-700 CE. Mosaic in a square frame. Invocation.</field><field name="description">
+            The mosaic was discovered in the earliest structure (Room A) of the church complex at Khirbet Abu Rish, a site nestled in the 'Anun valley, which separates the Hebron Mountains from the Judean Desert. The church complex comprises a large courtyard, water cisterns, wine-pressing installations, and several tombs. The sides of the mosaic in Room A are all one meter in length. The framed inscription is situated in the center of the mosaic. The letters are made out of black stones and placed on a white background. The inscription does not have spelling or grammatical errors. The only abbreviation used was that of the sacra nomina, or the sacred name, in the first line. The first five lines of the inscription are damaged. The text is a supplication, in which a person asks a supernatural deity to provide something. The individual who wrote the inscription is asking Jesus to remember a person who has passed away, whose name has not been preserved, and he/she is also asking for the remembrance of those who pray and contribute to this place. The inscription therefore showcases the significance of this place for Christians.
+         </field></doc></add>'''
+        updated_xml = prepper.update_status( display_status, initial_solr_xml )
+        self.assertEqual(
+            True,
+            '<field name="display_status">foo</field>' in updated_xml
             )

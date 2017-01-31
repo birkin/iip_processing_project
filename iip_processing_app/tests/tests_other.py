@@ -1,0 +1,60 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
+""" Contains tests for git-pulls and rq processing. """
+
+import json, logging, os, time
+import redis, rq
+from django.test import TestCase
+from iip_processing_app.lib import processor
+from iip_processing_app.lib.processor import Puller
+
+
+log = logging.getLogger(__name__)
+TestCase.maxDiff = None
+puller = Puller()
+
+
+class PrepperOtherTest(TestCase):
+    """ Checks processor.py functions that depend on git-pulls or rq jobs. """
+
+    def setUp(self):
+        self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
+
+    def test_call_git_pull(self):
+        """ Checks for successful pull. """
+        self.assertEqual(
+            0,  # 0 means no problems; 1 means a problem
+            puller.call_git_pull()
+            )
+
+    def test_run_call_git_pull(self):
+        """ Triggers processing for processor.run_call_git_pull(); checks for no failed jobs. """
+        ## confirm no processing jobs running
+        q = rq.Queue( self.queue_name, connection=redis.Redis() )
+        self.assertEqual( 0, len(q.jobs) )
+        ##
+        ## confirm no processing failed jobs
+        failed_queue = rq.queue.get_failed_queue( connection=redis.Redis() )
+        failed_count = 0
+        for job in failed_queue.jobs:
+            if job.origin == self.queue_name:
+                failed_count += 1
+        self.assertEqual( 0, failed_count )
+        ##
+        ## call processor.run_call_git_pull( to_process_dct )
+        to_process_dct = {
+            u'files_removed': [],
+            u'files_updated': ['abur0001'],
+            u'timestamp': u'2017-01-24 09:52:38.911009' }
+        processor.run_call_git_pull( to_process_dct )
+        ##
+        ## confirm no processing failed jobs
+        time.sleep( 2 )
+        failed_queue = rq.queue.get_failed_queue( connection=redis.Redis() )
+        failed_count = 0
+        for job in failed_queue.jobs:
+            if job.origin == self.queue_name:
+                failed_count += 1
+        self.assertEqual( 0, failed_count )
