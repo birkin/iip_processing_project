@@ -6,6 +6,7 @@ python:
 cache: pip
 
 install:
+  - pip install --use-wheel --no-index --find-links=/tmp lxml
   - pip install -r ./config/requirements.txt
 
 script: python run_travis_tests.py
