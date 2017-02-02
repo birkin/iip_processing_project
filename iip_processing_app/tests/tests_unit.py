@@ -7,13 +7,14 @@ from __future__ import unicode_literals
 import base64, json, logging, os, time
 import requests
 from django.test import TestCase
-from iip_processing_app.lib.github_helper import GHHelper
+from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.processor import Prepper
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
+gh_validator = GHValidator()
 prepper = Prepper()
 
 
@@ -51,7 +52,7 @@ class HBAuthParserTest(TestCase):
         log.debug( 'basic_auth_string, ```{}```'.format(basic_auth_string) )
         self.assertEqual(
             { 'received_username': 'username_foo', 'received_password': 'password_bar' },
-            gh_helper.parse_http_basic_auth( basic_auth_string )
+            gh_validator.parse_http_basic_auth( basic_auth_string )
             )
 
 

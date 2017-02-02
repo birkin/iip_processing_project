@@ -10,8 +10,8 @@ from iip_processing_app.lib import processor
 log = logging.getLogger(__name__)
 
 
-class GHHelper( object ):
-    """ Contains support functions for views.git_watcher() """
+class GHValidator( object ):
+    """ Contains functions to validate incoming request. """
 
     def __init__( self ):
         self.AUTH_USERNAME = unicode( os.environ['IIP_PRC__BASIC_AUTH_USERNAME'] )
@@ -45,6 +45,45 @@ class GHHelper( object ):
         resp.status_code = 401
         resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
         return resp
+
+    ## end class GHValidator()
+
+
+class GHHelper( object ):
+    """ Contains support functions for views.git_watcher() """
+
+    def __init__( self ):
+        # self.AUTH_USERNAME = unicode( os.environ['IIP_PRC__BASIC_AUTH_USERNAME'] )
+        # self.AUTH_PASSWORD = unicode( os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'] )
+        self.DEV_URL = unicode( os.environ['IIP_PRC__DEV_URL'] )
+        self.PRODUCTION_HOSTNAME = unicode( os.environ['IIP_PRC__PRODUCTION_HOSTNAME'] )
+
+    # def parse_http_basic_auth( self, basic_auth_header_text ):
+    #     """ Returns parsed username and password. """
+    #     log.debug( 'starting parse_http_basic_auth()' )
+    #     userpass_dct = { 'username': None, 'password': None }
+    #     auth = basic_auth_header_text.split()
+    #     if len(auth) == 2:
+    #         if auth[0].lower() == 'basic':
+    #             ( received_username, received_password ) = base64.b64decode( auth[1] ).split( ':' )
+    #             userpass_dct = { 'received_username': received_username, 'received_password': received_password }
+    #     return userpass_dct
+
+    # def validate_credentials( self, received_auth_dct ):
+    #     """ Checks credentials. """
+    #     return_val = False
+    #     if received_auth_dct['received_username'] == self.AUTH_USERNAME and received_auth_dct['received_password'] == self.AUTH_PASSWORD:
+    #         return_val = True
+    #     log.debug( 'return_val, ```{}```'.format(return_val) )
+    #     return return_val
+
+    # def make_unauthenticated_response( self ):
+    #     """ Returns proper 401 response. """
+    #     log.debug( 'preparing 401 response' )
+    #     resp = HttpResponse( '401 / Not Authenticated' )
+    #     resp.status_code = 401
+    #     resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
+    #     return resp
 
     def handle_inscription_update( self, request_body, host ):
         """ Enqueues first of a series of processing jobs. """
