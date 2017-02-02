@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import base64, json, logging, os, time
 import requests
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.processor import Prepper
@@ -44,6 +45,17 @@ class GHValidatorTest(TestCase):
 
     def setUp(self):
         pass
+
+    def test_parse_signature(self):
+        """ Checks parsing of github's X-Hub-Signature header. """
+        dummy_secret = 'foo'
+        data_dct = { 'foo': 'bar' }
+        payload = json.dumps( data_dct )
+        dummy_signature = 'sha1=' + hmac.new( dummy_secret, payload, hashlib.sha1 ).hexdigest()
+        self.assertEqual(
+            2,
+            gh_validator.parse_signature( dummy_signature, payload, dummy_secret )
+            )
 
     def test_parse_http_basic_auth(self):
         """ Checks parsing of username and password. """
