@@ -26,6 +26,7 @@ def info( request ):
 def gh_inscription_watcher( request ):
     """ Handles github inscriptions web-hook notification. """
     log.debug( 'request.body, ```{}```'.format(pprint.pformat(request.body)) )
+    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
     resp = HttpResponseForbidden( '403 / Forbidden' )  # will be returned if incorrect basic-auth credentials are submitted
     if 'HTTP_AUTHORIZATION' in request.META:
         received_username_password_dct = github_helper.parse_http_basic_auth( request.META['HTTP_AUTHORIZATION'].decode('utf-8') )
