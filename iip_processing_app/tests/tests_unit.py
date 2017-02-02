@@ -39,13 +39,13 @@ class RootUrlTest(TestCase):
         self.assertEqual(  '/info/', redirect_url )
 
 
-class HBAuthParserTest(TestCase):
-    """ Checks parsing of http-basic-auth incoming info. """
+class GHValidatorTest(TestCase):
+    """ Checks code handling incoming info. """
 
     def setUp(self):
         pass
 
-    def test_legit_info(self):
+    def test_parse_http_basic_auth(self):
         """ Checks parsing of username and password. """
         encoded_string = base64.encodestring( '{usrnm}:{psswd}'.format(usrnm='username_foo', psswd='password_bar') ).replace( '\n', '' )
         basic_auth_string = 'Basic {}'.format( encoded_string )
