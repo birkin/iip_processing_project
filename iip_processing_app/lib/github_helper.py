@@ -53,6 +53,10 @@ class GHHelper( object ):
     """ Contains support functions for views.git_watcher() """
 
     def __init__( self ):
+        """ Grabs env-vars.
+            Note: auth-username and auth-password no longer used for validation here, but still needed for dev pass-through. """
+        self.AUTH_USERNAME = unicode( os.environ['IIP_PRC__BASIC_AUTH_USERNAME'] )
+        self.AUTH_PASSWORD = unicode( os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'] )
         self.DEV_URL = unicode( os.environ['IIP_PRC__DEV_URL'] )
         self.PRODUCTION_HOSTNAME = unicode( os.environ['IIP_PRC__PRODUCTION_HOSTNAME'] )
 
