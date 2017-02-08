@@ -46,20 +46,6 @@ class GHValidatorTest(TestCase):
     def setUp(self):
         pass
 
-    def test_parse_signature(self):
-        """ Checks parsing of github's X-Hub-Signature header.
-            Note: hmac requires a byte-string secret. """
-        log.debug( 'HELLO' )
-        dummy_secret = 'foo'.encode('utf-8')
-        payload_utf8 = json.dumps( { 'foo': 'bar' } )
-        hmac_digest_utf8 = hmac.new( dummy_secret, payload_utf8, hashlib.sha1 ).hexdigest()
-        dummy_signature = 'sha1={}'.format( unicode(hmac_digest_utf8) )
-        log.debug( 'type(dummy_signature), ```{}```'.format(type(dummy_signature)) )
-        self.assertEqual(
-            2,
-            gh_validator.parse_signature( dummy_signature, payload, dummy_secret )
-            )
-
     def test_parse_http_basic_auth(self):
         """ Checks parsing of username and password. """
         encoded_string = base64.encodestring( '{usrnm}:{psswd}'.format(usrnm='username_foo', psswd='password_bar') ).replace( '\n', '' )
@@ -68,6 +54,17 @@ class GHValidatorTest(TestCase):
         self.assertEqual(
             { 'received_username': 'username_foo', 'received_password': 'password_bar' },
             gh_validator.parse_http_basic_auth( basic_auth_string )
+            )
+    def test_parse_signature(self):
+        """ Checks parsing of github's X-Hub-Signature header.
+            Note: hmac requires a byte-string secret. """
+        dummy_secret = 'foo_secret'
+        dummy_payload = unicode( json.dumps( { 'foo': 'bar' } ) )
+        dummy_signature = 'sha1=6ef7bc87b6a827c49de558766f2229f8d3e5e81c'
+        log.debug( 'type(dummy_signature), ```{}```'.format(type(dummy_signature)) )
+        self.assertEqual(
+            dummy_signature,
+            gh_validator.grab_signature( dummy_secret, dummy_payload  )
             )
 
 

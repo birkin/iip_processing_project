@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import base64, datetime, json, logging, os, pprint
+import base64, datetime, hashlib, hmac, json, logging, os, pprint
 import requests
 from django.http import HttpResponse
 from iip_processing_app.lib import processor
@@ -20,7 +20,8 @@ class GHValidator( object ):
         self.PRODUCTION_HOSTNAME = unicode( os.environ['IIP_PRC__PRODUCTION_HOSTNAME'] )
 
     def parse_http_basic_auth( self, basic_auth_header_text ):
-        """ Returns parsed username and password. """
+        """ Returns parsed username and password.
+            Called by views.gh_inscription_watcher() """
         log.debug( 'starting parse_http_basic_auth()' )
         userpass_dct = { 'username': None, 'password': None }
         auth = basic_auth_header_text.split()
@@ -31,7 +32,8 @@ class GHValidator( object ):
         return userpass_dct
 
     def validate_credentials( self, received_auth_dct ):
-        """ Checks credentials. """
+        """ Checks credentials.
+            Called by views.gh_inscription_watcher() """
         return_val = False
         if received_auth_dct['received_username'] == self.AUTH_USERNAME and received_auth_dct['received_password'] == self.AUTH_PASSWORD:
             return_val = True
@@ -39,12 +41,22 @@ class GHValidator( object ):
         return return_val
 
     def make_unauthenticated_response( self ):
-        """ Returns proper 401 response. """
+        """ Returns proper 401 response.
+            Called by views.gh_inscription_watcher() """
         log.debug( 'preparing 401 response' )
         resp = HttpResponse( '401 / Not Authenticated' )
         resp.status_code = 401
         resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
         return resp
+
+    def grab_signature( self, secret, payload ):
+        """ Returns signature of payload.
+            Note, secret must be utf8; payload can be unicode. """
+        secret_utf8 = secret.encode( 'utf-8' )
+        hmac_digest_utf8 = hmac.new( secret_utf8, payload, hashlib.sha1 ).hexdigest()
+        signature = 'sha1={}'.format( unicode(hmac_digest_utf8) )
+        log.debug( 'signature, ```{}```'.format(signature) )
+        return signature
 
     ## end class GHValidator()
 
