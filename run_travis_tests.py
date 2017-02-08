@@ -18,6 +18,7 @@ if __name__ == '__main__':
         'IIP_PRC__DEV_URL',
         'IIP_PRC__DISPLAY_STATUSES_BACKUP_DIR',
         'IIP_PRC__PRODUCTION_HOSTNAME',
+        'IIP_PRC__REPO_SECRET_KEY',
         'IIP_PRC__SOLR_DOC_STYLESHEET_PATH',
         'IIP_PRC__SOLR_URL',
         'IIP_PRC__STATUSES_GIST_PASSWORD',
