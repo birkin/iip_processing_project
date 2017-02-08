@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 """ Contains travis-ci.org friendly tests. """
 
-import base64, json, logging, os, time
+import base64, hashlib, hmac, json, logging, os, time
 import requests
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -47,11 +47,14 @@ class GHValidatorTest(TestCase):
         pass
 
     def test_parse_signature(self):
-        """ Checks parsing of github's X-Hub-Signature header. """
-        dummy_secret = 'foo'
-        data_dct = { 'foo': 'bar' }
-        payload = json.dumps( data_dct )
-        dummy_signature = 'sha1=' + hmac.new( dummy_secret, payload, hashlib.sha1 ).hexdigest()
+        """ Checks parsing of github's X-Hub-Signature header.
+            Note: hmac requires a byte-string secret. """
+        log.debug( 'HELLO' )
+        dummy_secret = 'foo'.encode('utf-8')
+        payload_utf8 = json.dumps( { 'foo': 'bar' } )
+        hmac_digest_utf8 = hmac.new( dummy_secret, payload_utf8, hashlib.sha1 ).hexdigest()
+        dummy_signature = 'sha1={}'.format( unicode(hmac_digest_utf8) )
+        log.debug( 'type(dummy_signature), ```{}```'.format(type(dummy_signature)) )
         self.assertEqual(
             2,
             gh_validator.parse_signature( dummy_signature, payload, dummy_secret )
