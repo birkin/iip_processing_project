@@ -59,12 +59,12 @@ class GHValidatorTest(TestCase):
         """ Checks parsing of github's X-Hub-Signature header.
             Note: hmac requires a byte-string secret. """
         dummy_secret = 'foo_secret'
-        dummy_payload = unicode( json.dumps( { 'foo': 'bar' } ) )
+        dummy_payload = unicode( json.dumps({ 'foo': 'bar' }) )
         dummy_signature = 'sha1=6ef7bc87b6a827c49de558766f2229f8d3e5e81c'
         log.debug( 'type(dummy_signature), ```{}```'.format(type(dummy_signature)) )
         self.assertEqual(
             dummy_signature,
-            gh_validator.grab_signature( dummy_secret, dummy_payload  )
+            gh_validator.determine_signature( dummy_secret, dummy_payload  )
             )
 
 

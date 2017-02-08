@@ -18,6 +18,29 @@ class GHValidator( object ):
         self.AUTH_PASSWORD = unicode( os.environ['IIP_PRC__BASIC_AUTH_PASSWORD'] )
         self.DEV_URL = unicode( os.environ['IIP_PRC__DEV_URL'] )
         self.PRODUCTION_HOSTNAME = unicode( os.environ['IIP_PRC__PRODUCTION_HOSTNAME'] )
+        self.SECRET = unicode(os.environ['IIP_PRC__REPO_SECRET_KEY'] )
+
+    # def validate_submission( self, submitted_basic_auth_info, submitted_signature, submitted_payload ):
+    #     """ Manages validation.
+    #         Called by views.gh_inscription_watcher() """
+    #     received_username_password_dct = self.parse_http_basic_auth( submitted_basic_auth_info )
+    #     if not self.validate_credentials( received_username_password_dct ):
+    #         return False
+    #     calculated_signature = self.determine_signature( self.SECRET, submitted_payload )
+    #     if not calculated_signature == submitted_signature:
+    #         return False
+    #     return True
+
+    def validate_submission( self, submitted_basic_auth_info, submitted_signature, submitted_payload ):
+        """ Manages validation.
+            Called by views.gh_inscription_watcher() """
+        received_username_password_dct = self.parse_http_basic_auth( submitted_basic_auth_info )
+        if not self.validate_credentials( received_username_password_dct ):
+            return False
+        calculated_signature = self.determine_signature( self.SECRET, submitted_payload )
+        if not calculated_signature == submitted_signature:
+            return False
+        return True
 
     def parse_http_basic_auth( self, basic_auth_header_text ):
         """ Returns parsed username and password.
@@ -49,7 +72,7 @@ class GHValidator( object ):
         resp['WWW-Authenticate'] = 'Basic realm="iip_processor"'
         return resp
 
-    def grab_signature( self, secret, payload ):
+    def determine_signature( self, secret, payload ):
         """ Returns signature of payload.
             Note, secret must be utf8; payload can be unicode. """
         secret_utf8 = secret.encode( 'utf-8' )
