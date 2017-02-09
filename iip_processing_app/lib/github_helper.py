@@ -147,7 +147,7 @@ class GHHelper( object ):
         if host == self.PRODUCTION_HOSTNAME:
             log.debug( 'gonna hit dev' )
             try:
-                headers = {'HTTP_X_HUB_SIGNATURE': submitted_signature}
+                headers = {'X_HUB_SIGNATURE': submitted_signature}
                 r = requests.post( self.DEV_URL, data=request_body, auth=(self.AUTH_USERNAME, self.AUTH_PASSWORD), headers=headers, timeout=10 )
                 log.debug( 'status_code, `{}`'.format(r.status_code) )
             except Exception as e:
