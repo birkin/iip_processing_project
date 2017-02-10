@@ -9,13 +9,14 @@ import requests
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
-from iip_processing_app.lib.processor import Prepper
+from iip_processing_app.lib.processor import Prepper, StatusBackupper
 
 
 log = logging.getLogger(__name__)
 TestCase.maxDiff = None
 gh_helper = GHHelper()
 gh_validator = GHValidator()
+stts_bckppr = StatusBackupper()
 prepper = Prepper()
 
 
@@ -109,6 +110,54 @@ class GitHubResponseParseTest(TestCase):
             )
 
 
+class StatusBackupperTest(TestCase):
+    """ Checks status-backup code. """
+
+    def test_parse_solr_response(self):
+        response_json = '''{
+          "response": {
+            "docs": [
+              { "display_status": "approved", "inscription_id": "masa481" },
+              { "display_status": "approved", "inscription_id": "abur0001" },
+              { "display_status": "approved", "inscription_id": "akas0002" },
+              { "display_status": "approved", "inscription_id": "ahma0001" },
+              { "display_status": "approved", "inscription_id": "abil0001" },
+              { "display_status": "approved", "inscription_id": "ahma0003" },
+              { "display_status": "approved", "inscription_id": "akas0001" },
+              { "display_status": "to_approve", "inscription_id": "tdor0004" }
+            ],
+            "numFound": 8,
+            "start": 0
+          },
+          "responseHeader": {
+            "QTime": 2,
+            "params": {
+              "fl": "inscription_id,display_status",
+              "indent": "true",
+              "q": "*:*",
+              "rows": "6000",
+              "wt": "json"
+            },
+            "status": 0
+          }
+        }'''
+        self.assertEqual(
+            '''{
+              "abil0001": "approved",
+              "abur0001": "approved",
+              "ahma0001": "approved",
+              "ahma0003": "approved",
+              "akas0001": "approved",
+              "akas0002": "approved",
+              "masa481": "approved",
+              "tdor0004": "to_approve"
+            }''',
+            stts_bckppr.parse_solr_response( response_json )
+            )
+
+    ## end class StatusBackupperTest()
+
+
 class PrepperUnitTest(TestCase):
     """ Checks travis-friendly processor.py functions. """
 
@@ -162,3 +211,5 @@ Judaea. Bethennim (Khirbet Abu Rish), in the church complex, Room A.
             True,
             '<field name="display_status">foo</field>' in updated_xml
             )
+
+    ## end class PrepperUnitTest()
