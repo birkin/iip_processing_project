@@ -60,7 +60,8 @@ class Puller( object ):
 
 
 class StatusBackupper( object ):
-    """ Manages creation and storage of json file of backup statuses. """
+    """ Manages creation and storage of json file of backup statuses.
+        Note that backup statuses are returned, and used in indexing. """
 
     def __init__( self ):
         """ Settings. """
@@ -75,21 +76,48 @@ class StatusBackupper( object ):
         """ Manages the backup process.
             Called by run_backup_statuses(). """
         log.debug( 'starting backup' )
-        status_json = self.make_status_json()
+        response_dct = self.query_solr()
+        status_dct = self.make_status_dct( response_dct )
+        status_json = json.dumps( status_dct, sort_keys=True, indent=2 )
         self.update_github( status_json )
         self.save_locally( status_json )
         self.delete_old_backups()
         return status_json
 
-    def make_status_json( self ):
-        """ Queries solr for current display-statuses and saves result to a json file.
+    def query_solr( self ):
+        """ Queries solr for current display-statuses and returns dct.
             Called by make_backup(). """
-        log.debug( 'starting status-grab from solr' )
         url = '{}/select?q=*:*&rows=6000&fl=inscription_id,display_status&wt=json&indent=true'.format( self.SOLR_URL )
         log.debug( 'url, ```{}```'.format(url) )
         r = requests.get( url )
-        status_json = r.content
-        return status_json
+        response_dct = json.loads( r.content )
+        log.debug( 'response_dct, ```{}```'.format(pprint.pformat(response_dct)) )
+        return response_dct
+
+    def make_status_dct( self, response_dct ):
+        """ Simplifies hash; returns dct.
+            Called by make_backup(). """
+        status_dct = {
+            'counts': { 'approved': 0, 'to_approve': 0, 'to_correct': 0, 'total': 0 },
+            'statuses': {}
+            }
+        status_dct = self.run_loop( response_dct, status_dct )
+        log.debug( 'status_dct, ```{}```'.format(pprint.pformat(status_dct)) )
+        return status_dct
+
+    def run_loop( self, response_dct, status_dct ):
+        """ Updates status_dct from response_dct.
+            Called by make_status_json() """
+        for entry in response_dct['response']['docs']:
+            status_dct['statuses'][ entry['inscription_id'] ] = entry['display_status']
+            status_dct['counts']['total'] += 1
+            if entry['display_status'] == 'approved':
+                status_dct['counts']['approved'] += 1
+            elif entry['display_status'] == 'to_approve':
+                status_dct['counts']['to_approve'] += 1
+            elif entry['display_status'] == 'to_correct':
+                status_dct['counts']['to_correct'] += 1
+        return status_dct
 
     def update_github( self, status_json ):
         """ Saves statuses to gist.
@@ -133,6 +161,83 @@ class StatusBackupper( object ):
         return
 
     ## end class StatusBackupper()
+
+
+# class StatusBackupper( object ):
+#     """ Manages creation and storage of json file of backup statuses.
+#         Note that backup statuses are returned, and used in indexing. """
+
+#     def __init__( self ):
+#         """ Settings. """
+#         self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
+#         self.DISPLAY_STATUSES_BACKUP_DIR = unicode( os.environ['IIP_PRC__DISPLAY_STATUSES_BACKUP_DIR'] )
+#         self.STATUSES_GIST_URL = unicode( os.environ['IIP_PRC__STATUSES_GIST_URL'] )
+#         self.STATUSES_GIST_USERNAME = unicode( os.environ['IIP_PRC__STATUSES_GIST_USERNAME'] )
+#         self.STATUSES_GIST_PASSWORD = unicode( os.environ['IIP_PRC__STATUSES_GIST_PASSWORD'] )
+#         self.DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS = int( os.environ['IIP_PRC__DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS'] )
+
+#     def make_backup( self ):
+#         """ Manages the backup process.
+#             Called by run_backup_statuses(). """
+#         log.debug( 'starting backup' )
+#         status_json = self.make_status_json()
+#         self.update_github( status_json )
+#         self.save_locally( status_json )
+#         self.delete_old_backups()
+#         return status_json
+
+#     def make_status_json( self ):
+#         """ Queries solr for current display-statuses and saves result to a json file.
+#             Called by make_backup(). """
+#         log.debug( 'starting status-grab from solr' )
+#         url = '{}/select?q=*:*&rows=6000&fl=inscription_id,display_status&wt=json&indent=true'.format( self.SOLR_URL )
+#         log.debug( 'url, ```{}```'.format(url) )
+#         r = requests.get( url )
+#         status_json = r.content
+#         return status_json
+
+#     def update_github( self, status_json ):
+#         """ Saves statuses to gist.
+#             Called by make_backup(). """
+#         log.debug( 'starting gist update' )
+#         auth = requests.auth.HTTPBasicAuth( self.STATUSES_GIST_USERNAME, self.STATUSES_GIST_PASSWORD )
+#         json_payload = json.dumps( {
+#             'description': 'backup of iip inscription display statuses',
+#             'files': {
+#                 'iip_display_statuses.json': { 'content': status_json },
+#               }
+#             } )
+#         r = requests.patch( url=self.STATUSES_GIST_URL, auth=auth, data=json_payload )
+#         return
+
+#     def save_locally( self, status_json ):
+#         """ Saves data locally.
+#             Called by make_backup().
+#             TODO: eventually commit status_json to a repo, and push to github, streamlining local and external backup. """
+#         log.debug( 'starting local save' )
+#         filename = 'display_statuses_backup_{}.json'.format( unicode(datetime.datetime.now()) ).replace( ' ', '_' )
+#         filepath = '{dir}/{fname}'.format( dir=self.DISPLAY_STATUSES_BACKUP_DIR, fname=filename )
+#         log.debug( 'filepath, ```{}```'.format(filepath) )
+#         with open( filepath, 'w' ) as f:
+#             f.write( status_json )
+#         return
+
+#     def delete_old_backups( self ):
+#         """ Deletes old backup display status files.
+#             Called by make_backup() """
+#         log.debug( 'starting old-backup deletion' )
+#         now = time.time()
+#         seconds_in_day = 60*60*24
+#         timeframe_days = seconds_in_day * self.DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS
+#         backup_files = os.listdir( self.DISPLAY_STATUSES_BACKUP_DIR )
+#         backup_files = [ unicode(x) for x in backup_files ]
+#         for backup_filename in backup_files:
+#             backup_filepath = '{dir}/{fname}'.format( dir=self.DISPLAY_STATUSES_BACKUP_DIR, fname=backup_filename )
+#             if os.stat( backup_filepath ).st_mtime < (now - timeframe_days):
+#                 os.remove( backup_filepath )
+#         return
+
+#     ## end class StatusBackupper()
 
 
 class Prepper( object ):
@@ -228,20 +333,6 @@ class Indexer( object ):
         log.debug( 'solr response result_dct, ```{}```'.format(pprint.pformat(result_dct)) )
         return
 
-    # def update_entry( self, solr_xml ):
-    #     """ Posts xml to solr.
-    #         Called by run_update_index_file() """
-    #     update_url = '{}/update/?commit=true'.format( self.SOLR_URL )
-    #     if 'dev' in self.SOLR_URL:
-    #         log.debug( 'solr update url, ```{}```'.format(update_url) )
-    #         headers = { 'content-type'.encode('utf-8'): 'text/xml; charset=utf-8'.encode('utf-8') }  # from testing, NON-unicode-string posts were bullet-proof
-    #         r = requests.post(
-    #             update_url.encode(u'utf-8'), headers=headers, data=solr_xml.encode('utf-8') )
-    #         result_dct = {
-    #             'response_status_code': r.status_code, 'response_text': r.content.decode('utf-8') }
-    #         log.debug( 'solr response result_dct, ```{}```'.format(pprint.pformat(result_dct)) )
-    #     return
-
     def delete_entry( self, file_id ):
         log.debug( 'file_id, `{}`'.format(file_id) )
         s = solr.Solr( self.SOLR_URL )
@@ -250,16 +341,6 @@ class Indexer( object ):
         s.close()
         log.debug( 'deletion-post complete; response, ```{}```'.format(response) )
         return
-
-    # def delete_entry( self, file_id ):
-    #     log.debug( 'file_id, `{}`'.format(file_id) )
-    #     if 'dev' in self.SOLR_URL:
-    #         s = solr.Solr( self.SOLR_URL )
-    #         response = s.delete( file_id )
-    #         s.commit()
-    #         s.close()
-    #         log.debug( 'deletion-post complete; response, ```{}```'.format(response) )
-    #     return
 
     ## end class Indexer()
 

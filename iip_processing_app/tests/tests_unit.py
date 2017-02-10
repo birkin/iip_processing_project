@@ -114,45 +114,43 @@ class StatusBackupperTest(TestCase):
     """ Checks status-backup code. """
 
     def test_parse_solr_response(self):
-        response_json = '''{
-          "response": {
-            "docs": [
-              { "display_status": "approved", "inscription_id": "masa481" },
-              { "display_status": "approved", "inscription_id": "abur0001" },
-              { "display_status": "approved", "inscription_id": "akas0002" },
-              { "display_status": "approved", "inscription_id": "ahma0001" },
-              { "display_status": "approved", "inscription_id": "abil0001" },
-              { "display_status": "approved", "inscription_id": "ahma0003" },
-              { "display_status": "approved", "inscription_id": "akas0001" },
-              { "display_status": "to_approve", "inscription_id": "tdor0004" }
-            ],
-            "numFound": 8,
-            "start": 0
-          },
-          "responseHeader": {
-            "QTime": 2,
-            "params": {
-              "fl": "inscription_id,display_status",
-              "indent": "true",
-              "q": "*:*",
-              "rows": "6000",
-              "wt": "json"
+        response_dct = {
+            u'response': {
+                u'docs': [
+                    {u'display_status': u'approved', u'inscription_id': u'masa481'},
+                    {u'display_status': u'approved', u'inscription_id': u'abur0001'},
+                    {u'display_status': u'approved', u'inscription_id': u'akas0002'},
+                    {u'display_status': u'approved', u'inscription_id': u'ahma0001'},
+                    {u'display_status': u'approved', u'inscription_id': u'abil0001'},
+                    {u'display_status': u'to_correct', u'inscription_id': u'ahma0003'},
+                    {u'display_status': u'approved', u'inscription_id': u'akas0001'},
+                    {u'display_status': u'to_approve', u'inscription_id': u'tdor0004'}],
+                u'numFound': 8,
+                u'start': 0},
+            u'responseHeader': {
+                u'QTime': 2,
+                u'params': {
+                    u'fl': u'inscription_id,display_status',
+                    u'indent': u'true',
+                    u'q': u'*:*',
+                    u'rows': u'6000',
+                    u'wt': u'json'},
+                u'status': 0}
+            }
+        self.assertEqual( {
+            u'counts': {
+                u'approved': 6, u'to_approve': 1, u'to_correct': 1, u'total': 8},
+            u'statuses': {
+                u'abil0001': u'approved',
+                u'abur0001': u'approved',
+                u'ahma0001': u'approved',
+                u'ahma0003': u'to_correct',
+                u'akas0001': u'approved',
+                u'akas0002': u'approved',
+                u'masa481': u'approved',
+                u'tdor0004': u'to_approve'}
             },
-            "status": 0
-          }
-        }'''
-        self.assertEqual(
-            '''{
-              "abil0001": "approved",
-              "abur0001": "approved",
-              "ahma0001": "approved",
-              "ahma0003": "approved",
-              "akas0001": "approved",
-              "akas0002": "approved",
-              "masa481": "approved",
-              "tdor0004": "to_approve"
-            }''',
-            stts_bckppr.parse_solr_response( response_json )
+            stts_bckppr.make_status_dct( response_dct )
             )
 
     ## end class StatusBackupperTest()
