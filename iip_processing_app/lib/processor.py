@@ -258,16 +258,27 @@ class Prepper( object ):
         statused_solr_doc = self.update_status( display_status, initial_solr_doc )
         return statused_solr_doc
 
+    # def determine_display_status( self, file_id, status_json ):
+    #     """ Returns display_status
+    #         Called by make_solr_data() """
+    #     dct = json.loads( status_json )
+    #     docs = dct['response']['docs']
+    #     status_dct = {}
+    #     for doc in docs:
+    #         status_dct[ doc['inscription_id'] ] = doc['display_status']
+    #     if file_id in status_dct:
+    #         display_status = status_dct[ file_id ]
+    #     else:
+    #         display_status = 'to_approve'
+    #     log.debug( 'display_status, `{}`'.format(display_status) )
+    #     return display_status
+
     def determine_display_status( self, file_id, status_json ):
         """ Returns display_status
             Called by make_solr_data() """
-        dct = json.loads( status_json )
-        docs = dct['response']['docs']
-        status_dct = {}
-        for doc in docs:
-            status_dct[ doc['inscription_id'] ] = doc['display_status']
-        if file_id in status_dct:
-            display_status = status_dct[ file_id ]
+        status_dct = json.loads( status_json )
+        if file_id in status_dct['statuses'].keys():
+            display_status = status_dct['statuses'][file_id]
         else:
             display_status = 'to_approve'
         log.debug( 'display_status, `{}`'.format(display_status) )
