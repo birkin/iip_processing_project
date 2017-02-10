@@ -125,7 +125,7 @@ class StatusBackupper( object ):
         log.debug( 'starting gist update' )
         auth = requests.auth.HTTPBasicAuth( self.STATUSES_GIST_USERNAME, self.STATUSES_GIST_PASSWORD )
         json_payload = json.dumps( {
-            'description': 'backup of iip inscription display statuses',
+            'description': '{} -- iip display statuses'.format(unicode(datetime.datetime.now())),
             'files': {
                 'iip_display_statuses.json': { 'content': status_json },
               }
