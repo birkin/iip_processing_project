@@ -10,12 +10,14 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.admin_authenticator import AdminValidator
+from iip_processing_app.lib.admin_helper import OrphanDeleter
 
 
 log = logging.getLogger(__name__)
 github_validator = GHValidator()
 github_helper = GHHelper()
 admin_validator = AdminValidator()
+orphan_deleter = OrphanDeleter()
 
 
 def info( request ):
@@ -52,6 +54,6 @@ def delete_solr_orphans( request ):
     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if admin_validator.validate_admin_request( eppn, dev_user, host ):
         context = orphan_deleter.prep_context()
-        resp = render( request, u'iip_processor_templates/show_proposed_deletions.html', context )
+        resp = render( request, u'iip_processing_templates/show_proposed_deletions.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
