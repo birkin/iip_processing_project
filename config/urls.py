@@ -18,7 +18,8 @@ urlpatterns = [
     url( r'^gh_inscription_watcher/$',  views.gh_inscription_watcher, name='gh_inscription_watcher_url' ),
 
     url( r'^process/all/$', views.process_all, name=u'process_all_url' ),
-    url( r'^process/delete_orphans/$', views.process_orphans, name=u'process_orphans_url' ),
+
+    url( r'^delete_solr_orphans/$', views.delete_solr_orphans, name=u'delete_orphans_url' ),
 
     url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
 
