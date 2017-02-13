@@ -20,6 +20,9 @@ class OrphanDeleter( object ):
             Called by views.delete_solr_orphans() """
         # data = [ 'aaa', 'bbb' ]
         data = []
+        ## get file listing
+        ## get solr listing
+        ## find solr entries not in file list
         log.debug( 'data, ```{}```'.format(pprint.pformat(data)) )
         return data
 
@@ -38,5 +41,6 @@ class OrphanDeleter( object ):
         """ Runs deletions.
             Called by views.delete_solr_orphans() """
         for inscription_id in id_lst:
+            ## insert solr deletion url here
             pass
         return
