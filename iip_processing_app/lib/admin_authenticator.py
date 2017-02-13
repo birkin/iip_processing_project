@@ -16,6 +16,12 @@ class AdminValidator( object ):
         self.ADMINS = json.loads( os.environ['IIP_PRC__LEGIT_ADMINS_JSON'] )
 
     def validate_admin_request( self, eppn, dev_user, host ):
-        """ aa.
+        """ Validates admin request.
             Called by views.delete_solr_orphans() """
-        return False
+        validity = False
+        if eppn in self.ADMINS:
+            validity = True
+        elif dev_user in self.ADMINS and host == '127.0.0.1':
+            validity = True
+        log.debug( 'validity, `{}`'.format(validity) )
+        return validity
