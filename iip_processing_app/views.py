@@ -53,7 +53,8 @@ def delete_solr_orphans( request ):
     resp = HttpResponseForbidden( '403 / Forbidden' )
     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if admin_validator.validate_admin_request( eppn, dev_user, host ):
-        context = orphan_deleter.prep_context()
+        data = orphan_deleter.prep_data()
+        context = orphan_deleter.prep_context( data )
         resp = render( request, u'iip_processing_templates/show_proposed_deletions.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp

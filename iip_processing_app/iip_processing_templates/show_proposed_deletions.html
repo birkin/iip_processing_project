@@ -7,7 +7,40 @@ show proposed deletions
 
 {% block content %}
 
-<h1>info (under construction)</h1>
+<style type="text/css">
+    #listing {
+         margin-top: 2em;
+        }
+    ul {
+        list-style-type: square;
+        margin-left: 2em;
+        font-size: 100%;
+        }
+    li {
+        margin-top: .5em;
+        }
+    hr {
+        margin-top: 2em;
+        }
+</style>
+
+{% if data %}
+<h1>
+Files to be removed...
+</h1>
+
+<p id="message">The following inscription-IDs in solr will be removed. For each file, there is no corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
+
+<div id="listing">
+    <ul>
+        {% for inscription_id in data %}
+        <li>{{ inscription_id }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+<p>No inscription-IDs to be removed from solr: all solr entries have  corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
+{% endif %}
 
 <hr/>
 
