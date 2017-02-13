@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import RedirectView
@@ -19,7 +20,8 @@ urlpatterns = [
 
     url( r'^process/all/$', views.process_all, name=u'process_all_url' ),
 
-    url( r'^delete_solr_orphans/$', views.delete_solr_orphans, name=u'delete_orphans_url' ),
+    url( r'^delete_solr_orphans/process_deletions/$', views.process_solr_deletions, name='process_deletions_url' ),
+    url( r'^delete_solr_orphans/$', views.delete_solr_orphans, name='delete_orphans_url' ),
 
     url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
 

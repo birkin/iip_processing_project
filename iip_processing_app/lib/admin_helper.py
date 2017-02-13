@@ -18,8 +18,8 @@ class OrphanDeleter( object ):
     def prep_data( self ):
         """ Prepares list of ids to be deleted from solr.
             Called by views.delete_solr_orphans() """
-        data = [ 'aaa', 'bbb' ]
-        # data = []
+        # data = [ 'aaa', 'bbb' ]
+        data = []
         log.debug( 'data, ```{}```'.format(pprint.pformat(data)) )
         return data
 
@@ -33,3 +33,10 @@ class OrphanDeleter( object ):
             }
         log.debug( 'context, ```{}```'.format(pprint.pformat(context)) )
         return context
+
+    def run_deletes( self, id_lst ):
+        """ Runs deletions.
+            Called by views.delete_solr_orphans() """
+        for inscription_id in id_lst:
+            pass
+        return

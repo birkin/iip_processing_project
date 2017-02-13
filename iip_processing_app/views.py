@@ -48,13 +48,25 @@ def process_all( request ):
 
 
 def delete_solr_orphans( request ):
-    """ Manages request to delete orphaned records from solr. """
-    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
+    """ Manages initial request to delete orphaned records from solr. """
+    request.session['ids_to_delete'] = json.dumps( [] )
     resp = HttpResponseForbidden( '403 / Forbidden' )
     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if admin_validator.validate_admin_request( eppn, dev_user, host ):
         data = orphan_deleter.prep_data()
+        request.session['ids_to_delete'] = json.dumps( data )
         context = orphan_deleter.prep_context( data )
         resp = render( request, u'iip_processing_templates/show_proposed_deletions.html', context )
+    log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
+    return resp
+
+
+def process_solr_deletions( request ):
+    """ Triggers actual deletion-processing. """
+    resp = HttpResponseForbidden( '403 / Forbidden' )
+    if request.method == 'POST':
+        orphan_deleter.run_deletes( json.loads(request.session.get('ids_to_delete')) )
+        resp = HttpResponse( 'deletions completed' )
+    request.session['ids_to_delete'] = json.dumps( [] )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
