@@ -19,27 +19,33 @@ show proposed deletions
     li {
         margin-top: .5em;
         }
+    form {
+        margin-top: 2em;
+        }
     hr {
         margin-top: 2em;
         }
 </style>
 
 {% if data %}
-<h1>
-Files to be removed...
-</h1>
+    <h1>
+    Files to be removed...
+    </h1>
 
-<p id="message">The following inscription-IDs in solr will be removed. For each file, there is no corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
+    <p id="message">The following inscription-IDs in solr will be removed. For each file, there is no corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
 
-<div id="listing">
-    <ul>
-        {% for inscription_id in data %}
-        <li>{{ inscription_id }}</li>
-        {% endfor %}
-    </ul>
-</div>
+    <div id="listing">
+        <ul>
+            {% for inscription_id in data %}
+            <li>{{ inscription_id }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <form method="post" action="process_deletions/">{% csrf_token %}
+        <input id="confirmation_button" type="submit" value="Go ahead and delete">
+    </form>
 {% else %}
-<p>No inscription-IDs to be removed from solr: all solr entries have  corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
+    <p>No inscription-IDs to be removed from solr: all solr entries have  corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
 {% endif %}
 
 <hr/>
