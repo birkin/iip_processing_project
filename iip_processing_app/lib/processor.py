@@ -4,8 +4,11 @@ from __future__ import unicode_literals
 
 """
 Contains:
-- Puller() class, for running git-pull.
-- A job-queue caller function.
+- Puller(), to call git-pull.
+- StatusBackupper(), to make and save the local and gist backups.
+- Prepper(), to prepare the data to be posted to solr.
+- Indexer(), to send updates and deletions to solr.
+- job-queue caller functions.
 """
 
 import datetime, json, logging, logging.config, os, pprint, shutil, time
@@ -163,83 +166,6 @@ class StatusBackupper( object ):
     ## end class StatusBackupper()
 
 
-# class StatusBackupper( object ):
-#     """ Manages creation and storage of json file of backup statuses.
-#         Note that backup statuses are returned, and used in indexing. """
-
-#     def __init__( self ):
-#         """ Settings. """
-#         self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
-#         self.DISPLAY_STATUSES_BACKUP_DIR = unicode( os.environ['IIP_PRC__DISPLAY_STATUSES_BACKUP_DIR'] )
-#         self.STATUSES_GIST_URL = unicode( os.environ['IIP_PRC__STATUSES_GIST_URL'] )
-#         self.STATUSES_GIST_USERNAME = unicode( os.environ['IIP_PRC__STATUSES_GIST_USERNAME'] )
-#         self.STATUSES_GIST_PASSWORD = unicode( os.environ['IIP_PRC__STATUSES_GIST_PASSWORD'] )
-#         self.DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS = int( os.environ['IIP_PRC__DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS'] )
-
-#     def make_backup( self ):
-#         """ Manages the backup process.
-#             Called by run_backup_statuses(). """
-#         log.debug( 'starting backup' )
-#         status_json = self.make_status_json()
-#         self.update_github( status_json )
-#         self.save_locally( status_json )
-#         self.delete_old_backups()
-#         return status_json
-
-#     def make_status_json( self ):
-#         """ Queries solr for current display-statuses and saves result to a json file.
-#             Called by make_backup(). """
-#         log.debug( 'starting status-grab from solr' )
-#         url = '{}/select?q=*:*&rows=6000&fl=inscription_id,display_status&wt=json&indent=true'.format( self.SOLR_URL )
-#         log.debug( 'url, ```{}```'.format(url) )
-#         r = requests.get( url )
-#         status_json = r.content
-#         return status_json
-
-#     def update_github( self, status_json ):
-#         """ Saves statuses to gist.
-#             Called by make_backup(). """
-#         log.debug( 'starting gist update' )
-#         auth = requests.auth.HTTPBasicAuth( self.STATUSES_GIST_USERNAME, self.STATUSES_GIST_PASSWORD )
-#         json_payload = json.dumps( {
-#             'description': 'backup of iip inscription display statuses',
-#             'files': {
-#                 'iip_display_statuses.json': { 'content': status_json },
-#               }
-#             } )
-#         r = requests.patch( url=self.STATUSES_GIST_URL, auth=auth, data=json_payload )
-#         return
-
-#     def save_locally( self, status_json ):
-#         """ Saves data locally.
-#             Called by make_backup().
-#             TODO: eventually commit status_json to a repo, and push to github, streamlining local and external backup. """
-#         log.debug( 'starting local save' )
-#         filename = 'display_statuses_backup_{}.json'.format( unicode(datetime.datetime.now()) ).replace( ' ', '_' )
-#         filepath = '{dir}/{fname}'.format( dir=self.DISPLAY_STATUSES_BACKUP_DIR, fname=filename )
-#         log.debug( 'filepath, ```{}```'.format(filepath) )
-#         with open( filepath, 'w' ) as f:
-#             f.write( status_json )
-#         return
-
-#     def delete_old_backups( self ):
-#         """ Deletes old backup display status files.
-#             Called by make_backup() """
-#         log.debug( 'starting old-backup deletion' )
-#         now = time.time()
-#         seconds_in_day = 60*60*24
-#         timeframe_days = seconds_in_day * self.DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS
-#         backup_files = os.listdir( self.DISPLAY_STATUSES_BACKUP_DIR )
-#         backup_files = [ unicode(x) for x in backup_files ]
-#         for backup_filename in backup_files:
-#             backup_filepath = '{dir}/{fname}'.format( dir=self.DISPLAY_STATUSES_BACKUP_DIR, fname=backup_filename )
-#             if os.stat( backup_filepath ).st_mtime < (now - timeframe_days):
-#                 os.remove( backup_filepath )
-#         return
-
-#     ## end class StatusBackupper()
-
-
 class Prepper( object ):
     """ Manages prep for solr post. """
 
@@ -257,21 +183,6 @@ class Prepper( object ):
         initial_solr_doc = self.make_initial_solr_doc( source_xml )
         statused_solr_doc = self.update_status( display_status, initial_solr_doc )
         return statused_solr_doc
-
-    # def determine_display_status( self, file_id, status_json ):
-    #     """ Returns display_status
-    #         Called by make_solr_data() """
-    #     dct = json.loads( status_json )
-    #     docs = dct['response']['docs']
-    #     status_dct = {}
-    #     for doc in docs:
-    #         status_dct[ doc['inscription_id'] ] = doc['display_status']
-    #     if file_id in status_dct:
-    #         display_status = status_dct[ file_id ]
-    #     else:
-    #         display_status = 'to_approve'
-    #     log.debug( 'display_status, `{}`'.format(display_status) )
-    #     return display_status
 
     def determine_display_status( self, file_id, status_json ):
         """ Returns display_status
