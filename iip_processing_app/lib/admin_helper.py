@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-import datetime, logging, os, pprint
+import datetime, glob, logging, os, pprint
 import requests
 
 
@@ -20,15 +20,13 @@ class OrphanDeleter( object ):
     def prep_data( self ):
         """ Prepares list of ids to be deleted from solr.
             Called by views.delete_solr_orphans() """
-        # data = [ 'aaa', 'bbb' ]
-        data = []
-        ## get file listing
         file_system_ids = self.build_directory_inscription_ids()
-        ## get solr listing
         solr_inscription_ids = self.build_solr_inscription_ids()
-        ## find solr entries not in file list
-        log.debug( 'data, ```{}```'.format(pprint.pformat(data)) )
-        return data
+        orphans = self.build_orphan_list( file_system_ids, solr_inscription_ids )
+        # orphans = [ 'aaa', 'bbb' ]
+        # orphans = []
+        log.debug( 'orphans, ```{}```'.format(pprint.pformat(orphans)) )
+        return orphans
 
     def build_directory_inscription_ids( self ):
         """ Returns list of file-system ids.
@@ -58,6 +56,16 @@ class OrphanDeleter( object ):
         solr_inscription_ids = sorted( solr_inscription_ids )
         log.info( 'len(solr_inscription_ids), `{len}`; solr_inscription_ids[0:3], `{three}`'.format(len=len(solr_inscription_ids), three=pprint.pformat(solr_inscription_ids[0:3])) )
         return solr_inscription_ids
+
+    def build_orphan_list( self, directory_inscription_ids, solr_inscription_ids ):
+        """ Returns list of solr-entries to delete.
+            Called by prep_data(). """
+        directory_set = set( directory_inscription_ids )
+        solr_set = set( solr_inscription_ids )
+        deletion_set = solr_set - directory_set
+        orphan_list = sorted( list(deletion_set) )
+        log.info( 'orphan_list, ```{}```'.format(ppint.pformat(orphan_list)) )
+        return orphan_list
 
     def prep_context( self, data ):
         """ Prepares response info.
