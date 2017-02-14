@@ -62,7 +62,8 @@ def delete_solr_orphans( request ):
 
 
 def process_solr_deletions( request ):
-    """ Triggers actual deletion-processing. """
+    """ Triggers actual deletion-processing.
+        The POST requirement, combined with built-in csrf protection, is enough to ensure hits are valid. """
     resp = HttpResponseForbidden( '403 / Forbidden' )
     if request.method == 'POST':
         orphan_deleter.run_deletes( json.loads(request.session.get('ids_to_delete')) )
