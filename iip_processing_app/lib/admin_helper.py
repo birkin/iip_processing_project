@@ -64,7 +64,7 @@ class OrphanDeleter( object ):
         solr_set = set( solr_inscription_ids )
         deletion_set = solr_set - directory_set
         orphan_list = sorted( list(deletion_set) )
-        log.info( 'orphan_list, ```{}```'.format(ppint.pformat(orphan_list)) )
+        log.info( 'orphan_list, ```{}```'.format(pprint.pformat(orphan_list)) )
         return orphan_list
 
     def prep_context( self, data ):
