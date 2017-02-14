@@ -81,6 +81,7 @@ class OrphanDeleter( object ):
     def run_deletes( self, id_lst ):
         """ Runs deletions.
             Called by views.delete_solr_orphans() """
+        log.debug( 'id_lst, ```{}```'.format(pprint.pformat(id_lst)) )
         for inscription_id in id_lst:
             ## insert solr deletion url here
             pass
