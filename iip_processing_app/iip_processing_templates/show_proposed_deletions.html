@@ -29,10 +29,10 @@ show proposed deletions
 
 {% if data %}
     <h1>
-    Files to be removed...
+    Solr entries to be removed...
     </h1>
 
-    <p id="message">The following inscription-IDs in solr will be removed. For each file, there is no corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
+    <p id="message">The following solr inscription-IDs will be removed. For each solr inscription_ID, there is _no_ corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
 
     <div id="listing">
         <ul>
@@ -45,7 +45,7 @@ show proposed deletions
         <input id="confirmation_button" type="submit" value="Go ahead and delete">
     </form>
 {% else %}
-    <p>No inscription-IDs to be removed from solr: all solr entries have  corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
+    <p>There are no solr inscription-IDs to remove; all solr entries have a corresponding file at `{{ inscription_dir_path }}/epidoc-files/`</p>
 {% endif %}
 
 <hr/>
