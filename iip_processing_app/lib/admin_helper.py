@@ -4,9 +4,11 @@ from __future__ import unicode_literals
 
 import datetime, glob, logging, os, pprint
 import requests
+from iip_processing_app.lib.processor import Indexer
 
 
 log = logging.getLogger(__name__)
+indexer = Indexer()
 
 
 class OrphanDeleter( object ):
@@ -83,6 +85,7 @@ class OrphanDeleter( object ):
             Called by views.delete_solr_orphans() """
         log.debug( 'id_lst, ```{}```'.format(pprint.pformat(id_lst)) )
         for inscription_id in id_lst:
-            ## insert solr deletion url here
-            pass
+            indexer.delete_entry( inscription_id )
         return
+
+    ## end class OrphanDeleter()

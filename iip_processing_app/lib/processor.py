@@ -256,6 +256,8 @@ class Indexer( object ):
         return
 
     def delete_entry( self, file_id ):
+        """ Deletes solr entry.
+            Called by run_remove_index_file(() """
         log.debug( 'file_id, `{}`'.format(file_id) )
         s = solr.Solr( self.SOLR_URL )
         response = s.delete( file_id )
