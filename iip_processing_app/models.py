@@ -25,3 +25,6 @@ class Status( models.Model ):
         lst = json.loads( jsn )
         object_dct = lst[0]
         return Status
+
+    class Meta:
+        verbose_name_plural = 'Statuses'
