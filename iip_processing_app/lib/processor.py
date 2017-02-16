@@ -278,19 +278,22 @@ class ProcessStatusUpdater( object ):
     def make_status_enqueued( self, to_process_dct ):
         """ Sends all to-process data to processing-status listener.
             Called by run_call_git_pull() """
+        log.debug( 'url, ```{}```'.format(self.PROCESS_STATUS_UPDATER_URL) )
         payload = {
             'to_process_dct': to_process_dct }
-        r = request.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
-        log.debug( 'post-result, ```{}```'.format(r.status_code) )
+        r = requests.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
+        log.debug( 'post-content, ```{}```'.format(r.content.decode('utf-8')) )
+        log.debug( 'post-status_code, ```{}```'.format(r.status_code) )
         return
 
     def update_single_status( self, inscription_id, status ):
         """ Updates status.
             Called when job is completed, by Indexer.indexer.update_entry()
             Eventually can be updated along the way. """
+        log.debug( 'url, ```{}```'.format(self.PROCESS_STATUS_UPDATER_URL) )
         payload = {
             'inscription_id': inscription_id, 'status': status }
-        r = request.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
+        r = requests.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
         log.debug( 'post-result, ```{}```'.format(r.status_code) )
         return
 

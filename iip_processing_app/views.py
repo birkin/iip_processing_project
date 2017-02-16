@@ -74,6 +74,7 @@ def process_solr_deletions( request ):
     return resp
 
 
+@csrf_exempt
 def update_processing_status( request ):
     """ Updates status table. """
     resp = HttpResponseForbidden( '403 / Forbidden' )
