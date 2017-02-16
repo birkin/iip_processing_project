@@ -77,32 +77,48 @@ def process_solr_deletions( request ):
 @csrf_exempt
 def update_processing_status( request ):
     """ Updates status table. """
+    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
+    log.debug( 'request.POST, ```{}```'.format(pprint.pformat(request.POST)) )
     resp = HttpResponseForbidden( '403 / Forbidden' )
     if unicode( request.META.get('HTTP_HOST', '') ) == '127.0.0.1':
+        log.debug( 'host ok' )
+        log.debug( 'request.body, ```{}```'.format(request.body) )
+        data_dct = json.loads( request.body )
+        log.debug( 'data_dct, ```{}```'.format(pprint.pformat(data_dct)) )
         ##
-        to_process_dct = request.GET.get('to_process_dct', None)
+        to_process_dct = data_dct.get( 'to_process_dct', '' )
+        log.debug( 'to_process_dct, ```{}```'.format(pprint.pformat(to_process_dct)) )
         if to_process_dct:
+            log.debug( 'here' )
             for inscription_id in to_process_dct.get( 'files_removed', [] ):
+                log.debug( 'here' )
                 try:
+                    log.debug( 'here' )
                     process_status = Status.objects.get( inscription_id )
                 except Exception as e:
+                    log.debug( 'here' )
                     process_status = Status()
                 process_status.status = 'queued for deletion'
             for inscription_id in to_process_dct.get( 'files_updated', [] ):
+                log.debug( 'here' )
                 try:
+                    log.debug( 'here' )
                     process_status = Status.objects.get( inscription_id )
                 except Exception as e:
+                    log.debug( 'here' )
                     process_status = Status()
                 process_status.status = 'queued for update'
+            process_status.save()
             resp = HttpResponse( '200 / OK' )
         ##
         else:
-            ( inscription_id, new_status ) = ( request.GET.get('inscription_id', None), request.GET.get('status', None) )
+            ( inscription_id, new_status ) = ( request.GET.get('inscription_id', ''), request.GET.get('status', '') )
             if inscription_id and new_status:
                 try:
                     process_status = Status.objects.get( inscription_id )
                 except Exception as e:
                     process_status = Status()
                 process_status.status = new_status
+                process_status.save()
                 resp = HttpResponse( '200 / OK' )
     return resp

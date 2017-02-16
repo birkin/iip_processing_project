@@ -281,8 +281,9 @@ class ProcessStatusUpdater( object ):
         log.debug( 'url, ```{}```'.format(self.PROCESS_STATUS_UPDATER_URL) )
         payload = {
             'to_process_dct': to_process_dct }
-        r = requests.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
-        log.debug( 'post-content, ```{}```'.format(r.content.decode('utf-8')) )
+        log.debug( 'payload, ```{}```'.format(pprint.pformat(payload)) )
+        r = requests.post( self.PROCESS_STATUS_UPDATER_URL, data=json.dumps(payload) )
+        # log.debug( 'post-content, ```{}```'.format(r.content.decode('utf-8')) )
         log.debug( 'post-status_code, ```{}```'.format(r.status_code) )
         return
 
