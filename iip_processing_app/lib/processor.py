@@ -275,14 +275,22 @@ class ProcessStatusUpdater( object ):
     def __init__( self ):
         self.PROCESS_STATUS_UPDATER_URL = os.environ['IIP_PRC__PROCESS_STATUS_UPDATER_URL']
 
-    def update_status( self, inscription_id, status ):
+    def make_status_enqueued( self, to_process_dct ):
+        """ Sends all to-process data to processing-status listener.
+            Called by run_call_git_pull() """
+        payload = {
+            'to_process_dct': to_process_dct }
+        r = request.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
+        log.debug( 'post-result, ```{}```'.format(r.status_code) )
+        return
+
+    def update_single_status( self, inscription_id, status ):
         """ Updates status.
-            Called when job is enqueued, by run_backup_statuses(),
-                and when completed, by Indexer.indexer.update_entry()
+            Called when job is completed, by Indexer.indexer.update_entry()
             Eventually can be updated along the way. """
         payload = {
             'inscription_id': inscription_id, 'status': status }
-        r = request.post( url, data=payload )
+        r = request.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
         log.debug( 'post-result, ```{}```'.format(r.status_code) )
         return
 
@@ -294,6 +302,7 @@ puller = Puller()
 backupper = StatusBackupper()
 prepper = Prepper()
 indexer = Indexer()
+process_status_updater = ProcessStatusUpdater()
 
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
@@ -303,6 +312,7 @@ def run_call_git_pull( to_process_dct ):
     time.sleep( 2 )  # let any existing in-process pull finish
     puller.call_git_pull()
     if to_process_dct['files_updated'] or to_process_dct['files_removed']:
+        process_status_updater.make_status_enqueued( to_process_dct )
         q.enqueue_call(
             func=u'iip_processing_app.lib.processor.run_backup_statuses',
             kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
