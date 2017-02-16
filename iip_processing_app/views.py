@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.admin_authenticator import AdminValidator
 from iip_processing_app.lib.admin_helper import OrphanDeleter
+from iip_processing_app.models import Status
 
 
 log = logging.getLogger(__name__)
@@ -71,3 +72,20 @@ def process_solr_deletions( request ):
     request.session['ids_to_delete'] = json.dumps( [] )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
+
+
+def update_processing_status( request ):
+    """ Updates status table. """
+    resp = HttpResponseForbidden( '403 / Forbidden' )
+    if unicode( request.META.get('HTTP_HOST', '') ) == '127.0.0.1':
+        ( inscription_id, new_status ) = ( request.GET.get('inscription_id', None), request.GET.get('status', None) )
+        if inscription_id and new_status:
+            try:
+                process_status = Status.objects.get( inscription_id )
+            except Exception as e:
+                process_status = Status()
+            process_status.status = new_status
+            resp = HttpResponse( '200 / OK' )
+    return resp
+
+

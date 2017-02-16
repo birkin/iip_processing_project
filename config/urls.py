@@ -23,6 +23,8 @@ urlpatterns = [
     url( r'^delete_solr_orphans/process_deletions/$', views.process_solr_deletions, name='process_deletions_url' ),
     url( r'^delete_solr_orphans/$', views.delete_solr_orphans, name='delete_orphans_url' ),
 
+    url( r'^update_processing_status/$', views.update_processing_status, name='update_processing_status_url' ),
+
     url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
 
     ]
