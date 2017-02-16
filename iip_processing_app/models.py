@@ -24,7 +24,8 @@ class Status( models.Model ):
         jsn = serializers.serialize( 'json', [self] )  # json string is single-item list
         lst = json.loads( jsn )
         object_dct = lst[0]
-        return Status
+        # return Status
+        return object_dct
 
     class Meta:
-        verbose_name_plural = 'Statuses'
+        verbose_name_plural = 'Processing Statuses'

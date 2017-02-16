@@ -81,9 +81,9 @@ class GitHubResponseParseTest(TestCase):
             {
               "added": [],
               "author": {
-                "email": "birkin.diana@gmail.com",
-                "name": "Birkin James Diana",
-                "username": "birkin"
+                "email": "aaa@aaa.edu",
+                "name": "First Last",
+                "username": "first"
               },
               "committer": {
                 "email": "noreply@github.com",

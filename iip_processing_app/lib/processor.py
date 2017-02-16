@@ -269,6 +269,24 @@ class Indexer( object ):
     ## end class Indexer()
 
 
+class ProcessStatusUpdater( object ):
+    """ Manages update of status table. """
+
+    def __init__( self ):
+        self.PROCESS_STATUS_UPDATER_URL = os.environ['IIP_PRC__PROCESS_STATUS_UPDATER_URL']
+
+    def update_status( self, inscription_id, status ):
+        """ Updates status.
+            Called when job is enqueued, by run_backup_statuses(),
+                and when completed, by Indexer.indexer.update_entry()
+            Eventually can be updated along the way. """
+        payload = {
+            'inscription_id': inscription_id, 'status': status }
+        r = request.post( url, data=payload )
+        log.debug( 'post-result, ```{}```'.format(r.status_code) )
+        return
+
+
 ## runners ##
 
 q = rq.Queue( u'iip_prc', connection=redis.Redis() )
