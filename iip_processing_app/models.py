@@ -1,10 +1,27 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import datetime, json, logging, os, pprint
-from django.conf import settings as project_settings
-from django.core.urlresolvers import reverse
+
+import json, logging, pprint
 from django.db import models
-from django.http import HttpResponseRedirect
+
 
 log = logging.getLogger(__name__)
+
+
+class Status( models.Model ):
+    """ Contains processing status. """
+    inscription_id = models.CharField( blank=True, max_length=8 )
+    modified_datetime = models.DateTimeField( auto_now_add=True )
+    status_summary = models.CharField( blank=True, max_length=20 )
+    status_detail = models.TextField( blank=True )
+
+    def __unicode__(self):
+        return self.inscription_id
+
+    def jsonify(self):
+        """ Returns object data in json-compatible dict. """
+        jsn = serializers.serialize( 'json', [self] )  # json string is single-item list
+        lst = json.loads( jsn )
+        object_dct = lst[0]
+        return Status
