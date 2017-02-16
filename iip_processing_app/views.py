@@ -78,14 +78,30 @@ def update_processing_status( request ):
     """ Updates status table. """
     resp = HttpResponseForbidden( '403 / Forbidden' )
     if unicode( request.META.get('HTTP_HOST', '') ) == '127.0.0.1':
-        ( inscription_id, new_status ) = ( request.GET.get('inscription_id', None), request.GET.get('status', None) )
-        if inscription_id and new_status:
-            try:
-                process_status = Status.objects.get( inscription_id )
-            except Exception as e:
-                process_status = Status()
-            process_status.status = new_status
+        ##
+        to_process_dct = request.GET.get('to_process_dct', None)
+        if to_process_dct:
+            for inscription_id in to_process_dct.get( 'files_removed', [] ):
+                try:
+                    process_status = Status.objects.get( inscription_id )
+                except Exception as e:
+                    process_status = Status()
+                process_status.status = 'queued for deletion'
+            for inscription_id in to_process_dct.get( 'files_updated', [] ):
+                try:
+                    process_status = Status.objects.get( inscription_id )
+                except Exception as e:
+                    process_status = Status()
+                process_status.status = 'queued for update'
             resp = HttpResponse( '200 / OK' )
+        ##
+        else:
+            ( inscription_id, new_status ) = ( request.GET.get('inscription_id', None), request.GET.get('status', None) )
+            if inscription_id and new_status:
+                try:
+                    process_status = Status.objects.get( inscription_id )
+                except Exception as e:
+                    process_status = Status()
+                process_status.status = new_status
+                resp = HttpResponse( '200 / OK' )
     return resp
-
-
