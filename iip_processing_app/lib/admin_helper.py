@@ -67,38 +67,48 @@ class ProcessStatusRecorder( object ):
         """ Adds enqueu info to processing-status db.
             Called by views.update_processing_status() """
         for inscription_id in to_process_dct.get( 'files_removed', [] ):
-            self.update_queued_status( inscription_id, 'queued for deletion' )
+            self.update_processing_status( inscription_id=inscription_id, new_status_summary='queued for deletion', new_status_detail='' )
         for inscription_id in to_process_dct.get( 'files_updated', [] ):
-            self.update_queued_status( inscription_id, 'queued for update' )
+            self.update_processing_status( inscription_id=inscription_id, new_status_summary='queued for update', new_status_detail='' )
         resp = HttpResponse( '200 / OK' )
         return resp
 
-    def update_queued_status( self, inscription_id, status_string ):
+    def update_processing_status( self, inscription_id, new_status_summary, new_status_detail ):
         """ Updates tracker that entry is queued for deletion.
-            Called by handle_enqueues() """
+            Called by handle_enqueues(), and by handle_single_update() """
         try:
             process_status = Status.objects.get( inscription_id=inscription_id )
         except Exception as e:
             process_status = Status( inscription_id=inscription_id )
-        process_status.status_summary = status_string
-        process_status.status_detail = ''
+        process_status.status_summary = new_status_summary
+        process_status.status_detail = new_status_detail
         process_status.save()
         return
 
     def handle_single_update( self, single_update_dct ):
         """ Updates single entry processed status.
             Called by views.update_processing_status() """
-        ( inscription_id, status_summary, status_detail ) = (
+        ( inscription_id, new_status_summary, new_status_detail ) = (
             single_update_dct['inscription_id'], single_update_dct['status_summary'], single_update_dct['status_detail'] )
-        try:
-            process_status = Status.objects.get( inscription_id=inscription_id )
-        except Exception as e:
-            process_status = Status( inscription_id=inscription_id )
-        process_status.status_summary = status_summary
-        process_status.status_detail = status_detail
-        process_status.save()
+        self.update_processing_status(
+            inscription_id=inscription_id, new_status_summary=new_status_summary, new_status_detail=new_status_detail )
         resp = HttpResponse( '200 / OK' )
         return resp
+
+    # def handle_single_update( self, single_update_dct ):
+    #     """ Updates single entry processed status.
+    #         Called by views.update_processing_status() """
+    #     ( inscription_id, status_summary, status_detail ) = (
+    #         single_update_dct['inscription_id'], single_update_dct['status_summary'], single_update_dct['status_detail'] )
+    #     try:
+    #         process_status = Status.objects.get( inscription_id=inscription_id )
+    #     except Exception as e:
+    #         process_status = Status( inscription_id=inscription_id )
+    #     process_status.status_summary = status_summary
+    #     process_status.status_detail = status_detail
+    #     process_status.save()
+    #     resp = HttpResponse( '200 / OK' )
+    #     return resp
 
     ## end class ProcessStatusRecorder()
 
