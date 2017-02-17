@@ -11,7 +11,7 @@ class StatusAdmin( admin.ModelAdmin ):
     ordering = [ 'inscription_id' ]
     list_display = [
         'inscription_id', 'status_summary', 'status_detail', 'modified_datetime' ]
-    # list_filter = [ 'patron_barcode' ]
+    list_filter = [ 'status_summary' ]
     search_fields = [
         'inscription_id', 'status_summary', 'status_detail' ]
     readonly_fields = [
