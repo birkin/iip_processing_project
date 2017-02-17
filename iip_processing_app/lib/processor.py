@@ -242,19 +242,6 @@ class Indexer( object ):
     def __init__( self ):
         self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
 
-    # def update_entry( self, solr_xml ):
-    #     """ Posts xml to solr.
-    #         Called by run_update_index_file() """
-    #     update_url = '{}/update/?commit=true'.format( self.SOLR_URL )
-    #     log.debug( 'solr update url, ```{}```'.format(update_url) )
-    #     headers = { 'content-type'.encode('utf-8'): 'text/xml; charset=utf-8'.encode('utf-8') }  # from testing, NON-unicode-string posts were bullet-proof
-    #     r = requests.post(
-    #         update_url.encode(u'utf-8'), headers=headers, data=solr_xml.encode('utf-8') )
-    #     result_dct = {
-    #         'response_status_code': r.status_code, 'response_text': r.content.decode('utf-8') }
-    #     log.debug( 'solr response result_dct, ```{}```'.format(pprint.pformat(result_dct)) )
-    #     return
-
     def update_entry( self, inscription_id, solr_xml ):
         """ Posts xml to solr.
             Called by run_update_index_file() """
@@ -302,17 +289,6 @@ class ProcessStatusUpdater( object ):
         log.debug( 'post-status_code, ```{}```'.format(r.status_code) )
         return
 
-    # def update_single_status( self, inscription_id, status ):
-    #     """ Updates status.
-    #         Called when job is completed, by Indexer.indexer.update_entry()
-    #         Eventually can be updated along the way. """
-    #     log.debug( 'url, ```{}```'.format(self.PROCESS_STATUS_UPDATER_URL) )
-    #     payload = {
-    #         'inscription_id': inscription_id, 'status': status }
-    #     r = requests.post( self.PROCESS_STATUS_UPDATER_URL, data=payload )
-    #     log.debug( 'post-result, ```{}```'.format(r.status_code) )
-    #     return
-
     def update_single_status( self, inscription_id, status, status_detail='' ):
         """ Updates status.
             Called when job is completed, by Indexer.indexer.update_entry()
@@ -324,6 +300,8 @@ class ProcessStatusUpdater( object ):
         r = requests.post( self.PROCESS_STATUS_UPDATER_URL, data=json.dumps(payload) )
         log.debug( 'post-result, ```{}```'.format(r.status_code) )
         return
+
+    ## end class ProcessStatusUpdater()
 
 
 ## runners ##
@@ -343,12 +321,20 @@ def run_call_git_pull( to_process_dct ):
     time.sleep( 2 )  # let any existing in-process pull finish
     puller.call_git_pull()
     if to_process_dct['files_updated'] or to_process_dct['files_removed']:
-        process_status_updater.make_status_enqueued( to_process_dct )
         q.enqueue_call(
-            func=u'iip_processing_app.lib.processor.run_backup_statuses',
-            kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
+            func=u'iip_processing_app.lib.processor.run_update_process_tracker',
+            kwargs={'to_process_dct': to_process_dct} )
     else:
         log.debug( 'no files to update; done' )
+    return
+
+def run_update_process_tracker( to_process_dct ):
+    """ Updates the process-tracker table with enqueued status.
+        Called by run_call_git_pull(). """
+    process_status_updater.make_status_enqueued( to_process_dct )
+    q.enqueue_call(
+        func=u'iip_processing_app.lib.processor.run_backup_statuses',
+        kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
     return
 
 def run_backup_statuses( files_to_update, files_to_remove ):
@@ -373,16 +359,6 @@ def run_remove_index_file( file_id ):
     indexer.delete_entry( file_id )
     log.debug( 'done processing file' )
 
-# def run_prep_file( file_id, status_json ):
-#     """ Prepares file for indexing.
-#         Called by run_backup_statuses() """
-#     log.debug( 'file_id, ```{}```'.format(file_id) )
-#     solr_xml = prepper.make_solr_data( file_id, status_json )
-#     log.debug( 'enqueuing next job' )
-#     q.enqueue_call(
-#         func='iip_processing_app.lib.processor.run_update_index_file',
-#         kwargs={'solr_xml': solr_xml} )
-
 def run_prep_file( file_id, status_json ):
     """ Prepares file for indexing.
         Called by run_backup_statuses() """
@@ -392,13 +368,6 @@ def run_prep_file( file_id, status_json ):
     q.enqueue_call(
         func='iip_processing_app.lib.processor.run_update_index_file',
         kwargs={'inscription_id': file_id, 'solr_xml': solr_xml} )
-
-# def run_update_index_file( solr_xml ):
-#     """ Updates index with new or changed info.
-#         Called by run_prep_file() """
-#     log.debug( 'partial solr_xml, ```{}```'.format(solr_xml[0:100]) )
-#     indexer.update_entry( solr_xml )
-#     log.debug( 'done processing file' )
 
 def run_update_index_file( inscription_id, solr_xml ):
     """ Updates index with new or changed info.
