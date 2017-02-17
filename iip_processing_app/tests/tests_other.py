@@ -61,7 +61,7 @@ class PrepperOtherTest(TestCase):
         ## call processor.run_call_git_pull( to_process_dct )
         to_process_dct = {
             'files_removed': [],
-            'files_updated': ['abur0001'],
+            'files_updated': ['abur0001', 'abur0002'],
             'timestamp': '2017-01-24 09:52:38.911009' }
         processor.run_call_git_pull( to_process_dct )
         ##

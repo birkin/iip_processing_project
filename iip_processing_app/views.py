@@ -94,31 +94,32 @@ def update_processing_status( request ):
                 log.debug( 'here' )
                 try:
                     log.debug( 'here' )
-                    process_status = Status.objects.get( inscription_id )
+                    process_status = Status.objects.get( inscription_id=inscription_id )
                 except Exception as e:
                     log.debug( 'here' )
                     process_status = Status()
-                process_status.status = 'queued for deletion'
+                process_status.status_summary = 'queued for deletion'
+                process_status.save()
             for inscription_id in to_process_dct.get( 'files_updated', [] ):
-                log.debug( 'here' )
+                log.debug( 'inscription_id, `{}`'.format(inscription_id) )
                 try:
                     log.debug( 'here' )
-                    process_status = Status.objects.get( inscription_id )
+                    process_status = Status.objects.get( inscription_id=inscription_id )
                 except Exception as e:
                     log.debug( 'here' )
-                    process_status = Status()
-                process_status.status = 'queued for update'
-            process_status.save()
+                    process_status = Status( inscription_id=inscription_id )
+                process_status.status_summary='queued for update'
+                process_status.save()
             resp = HttpResponse( '200 / OK' )
         ##
         else:
             ( inscription_id, new_status ) = ( request.GET.get('inscription_id', ''), request.GET.get('status', '') )
             if inscription_id and new_status:
                 try:
-                    process_status = Status.objects.get( inscription_id )
+                    process_status = Status.objects.get( inscription_id=inscription_id )
                 except Exception as e:
-                    process_status = Status()
-                process_status.status = new_status
+                    process_status = Status( inscription_id=inscription_id )
+                process_status.status_summary = new_status
                 process_status.save()
                 resp = HttpResponse( '200 / OK' )
     return resp

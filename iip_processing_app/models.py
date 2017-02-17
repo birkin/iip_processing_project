@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 class Status( models.Model ):
     """ Contains processing status. """
     inscription_id = models.CharField( blank=True, max_length=8 )
-    modified_datetime = models.DateTimeField( auto_now_add=True )
+    modified_datetime = models.DateTimeField( auto_now=True )
     status_summary = models.CharField( blank=True, max_length=20 )
     status_detail = models.TextField( blank=True )
 
