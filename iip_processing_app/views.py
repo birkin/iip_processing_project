@@ -113,13 +113,18 @@ def update_processing_status( request ):
             resp = HttpResponse( '200 / OK' )
         ##
         else:
-            ( inscription_id, new_status ) = ( request.GET.get('inscription_id', ''), request.GET.get('status', '') )
-            if inscription_id and new_status:
+            ( inscription_id, new_status_summary, new_status_detail ) = (
+                data_dct.get('inscription_id', ''), data_dct.get('status_summary', ''), data_dct.get('status_detail', '') )
+            log.debug( 'inscription_id, `{}`'.format(inscription_id) )
+            log.debug( 'new_status_summary, `{}`'.format(new_status_summary) )
+            log.debug( 'new_status_detail, `{}`'.format(new_status_detail) )
+            if inscription_id and new_status_summary:
                 try:
                     process_status = Status.objects.get( inscription_id=inscription_id )
                 except Exception as e:
                     process_status = Status( inscription_id=inscription_id )
-                process_status.status_summary = new_status
+                process_status.status_summary = new_status_summary
+                process_status.status_detail = new_status_detail
                 process_status.save()
                 resp = HttpResponse( '200 / OK' )
     return resp
