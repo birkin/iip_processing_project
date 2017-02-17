@@ -99,6 +99,7 @@ def update_processing_status( request ):
                     log.debug( 'here' )
                     process_status = Status()
                 process_status.status_summary = 'queued for deletion'
+                process_status.status_detail = ''
                 process_status.save()
             for inscription_id in to_process_dct.get( 'files_updated', [] ):
                 log.debug( 'inscription_id, `{}`'.format(inscription_id) )
@@ -109,6 +110,7 @@ def update_processing_status( request ):
                     log.debug( 'here' )
                     process_status = Status( inscription_id=inscription_id )
                 process_status.status_summary='queued for update'
+                process_status.status_detail = ''
                 process_status.save()
             resp = HttpResponse( '200 / OK' )
         ##

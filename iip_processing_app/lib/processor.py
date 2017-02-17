@@ -266,7 +266,7 @@ class Indexer( object ):
         result_dct = {
             'response_status_code': r.status_code, 'response_text': r.content.decode('utf-8') }
         log.debug( 'solr response result_dct, ```{}```'.format(pprint.pformat(result_dct)) )
-        process_status_updater.update_single_status( inscription_id=inscription_id, status='processed', status_detail=result_dct )
+        process_status_updater.update_single_status( inscription_id=inscription_id, status='update-processed', status_detail=result_dct )
         return
 
     def delete_entry( self, file_id ):
@@ -278,6 +278,7 @@ class Indexer( object ):
         s.commit()
         s.close()
         log.debug( 'deletion-post complete; response, ```{}```'.format(response) )
+        process_status_updater.update_single_status( inscription_id=file_id, status='deletion-processed', status_detail=response )
         return
 
     ## end class Indexer()
