@@ -79,17 +79,13 @@ def process_solr_deletions( request ):
 def update_processing_status( request ):
     """ Updates status table. """
     log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
-    try:
-        resp = HttpResponseForbidden( '403 / Forbidden' )
-        if unicode( request.META.get('HTTP_HOST', '') ) == '127.0.0.1':
-            ( to_process_dct, single_update_dct ) = process_status_recorder.check_for_data( request.body )
-            if to_process_dct:
-                resp = process_status_recorder.handle_enqueues( to_process_dct )
-            elif single_update_dct:
-                resp = process_status_recorder.handle_single_update( single_update_dct )
-    except Exception as e:
-        log.debug( 'exception, ```{}```'.format(unicode(repr(e))) )
-        resp = HttpResponseForbidden( '403 / Forbidden' )
+    resp = HttpResponseForbidden( '403 / Forbidden' )
+    if unicode( request.META.get('HTTP_HOST', '') ) == '127.0.0.1':
+        ( to_process_dct, single_update_dct ) = process_status_recorder.check_for_data( request.body )
+        if to_process_dct:
+            resp = process_status_recorder.handle_enqueues( to_process_dct )
+        elif single_update_dct:
+            resp = process_status_recorder.handle_single_update( single_update_dct )
     return resp
 
 
