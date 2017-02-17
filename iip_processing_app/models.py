@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import json, logging, pprint
+from django.core import serializers
 from django.db import models
 
 
