@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import logging, os, pprint
+
+import json, logging, os, pprint
 from django.conf import settings
 from django.contrib.auth import authenticate
 

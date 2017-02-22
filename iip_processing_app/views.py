@@ -22,6 +22,7 @@ github_helper = GHHelper()
 admin_validator = AdminValidator()
 orphan_deleter = OrphanDeleter()
 process_status_recorder = ProcessStatusRecorder()
+user_grabber = UserGrabber()
 
 
 def info( request ):
