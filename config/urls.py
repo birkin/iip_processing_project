@@ -25,6 +25,8 @@ urlpatterns = [
 
     url( r'^update_processing_status/$', views.update_processing_status, name='update_processing_status_url' ),
 
+    url( r'^view_processing/$', views.view_processing, name='view_processing_url' ),
+
     url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
 
     ]
