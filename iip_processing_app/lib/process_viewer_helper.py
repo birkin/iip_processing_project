@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import logging, pprint
+import logging, os, pprint
 from django.conf import settings
 from django.contrib.auth import authenticate
 
@@ -12,10 +12,10 @@ log = logging.getLogger(__name__)
 class UserGrabber(object):
 
     def __init__( self ):
-        self.LEGIT_VIEWER_USER = ''
-        self.LEGIT_VIEWER_PASSWORD = ''
-        self.LEGIT_VIEWER_GROUPER_GROUPS = []
-        self.LEGIT_VIEWER_EPPNS = []
+        self.LEGIT_VIEWER_USER = unicode( os.environ['IIP_PRC__LEGIT_QUEUE_VIEWER_USER'] )
+        self.LEGIT_VIEWER_PASSWORD = unicode( os.environ['IIP_PRC__LEGIT_QUEUE_VIEWER_PASSWORD'] )
+        self.LEGIT_VIEWER_GROUPER_GROUPS = json.loads( os.environ['IIP_PRC__LEGIT_QUEUE_VIEWER_GROUPS_JSON'] )
+        self.LEGIT_VIEWER_EPPNS = json.loads( os.environ['IIP_PRC__LEGIT_QUEUE_VIEWER_EPPNS_JSON'] )
 
     def get_user( self, meta_dct ):
         """ Returns user object.
