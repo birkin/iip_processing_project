@@ -182,7 +182,7 @@ class Prepper( object ):
         source_xml = self.grab_inscription( file_id )
         initial_solr_doc = self.make_initial_solr_doc( source_xml )
         statused_solr_doc = self.update_status( display_status, initial_solr_doc )
-        process_status_updater.update_single_status( inscription_id=inscription_id, status='data-prepared', status_detail='' )
+        process_status_updater.update_single_status( inscription_id=file_id, status='data-prepared', status_detail='' )
         return statused_solr_doc
 
     def determine_display_status( self, file_id, status_json ):
