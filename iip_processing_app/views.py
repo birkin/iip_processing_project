@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import datetime, json, logging, os, pprint
 from django.conf import settings
+from django.contrib.auth import login as django_login
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
