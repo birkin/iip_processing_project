@@ -73,6 +73,7 @@ class ShibChecker( object ):
             if group in user_memberships:
                 return_val = True
                 break
+        log.debug( 'check_group() return_val, `{}`'.format(return_val) )
         return return_val
 
     def check_eppn( self, eppn ):
@@ -81,6 +82,7 @@ class ShibChecker( object ):
         return_val = False
         if eppn in self.LEGIT_VIEWER_EPPNS:
             return_val = True
+        log.debug( 'check_eppn() return_val, `{}`'.format(return_val) )
         return return_val
 
     def grab_shib_from_meta( self, meta_dct ):
