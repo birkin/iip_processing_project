@@ -51,7 +51,6 @@ class ShibChecker( object ):
         return_val = False
         shib_dct = self.grab_shib_info( meta_dct )
         if shib_dct:
-            log.debug( 'shib_dct exists' )
             if self.check_group( shib_dct['member_of'] ):
                 return_val = True
             elif self.check_eppn( shib_dct['eppn'] ):
@@ -71,22 +70,17 @@ class ShibChecker( object ):
     def check_group( self, user_memberships ):
         """ Checks user's grouper groups.
             Called by validate_user() """
-        log.debug( 'starting check_group()' )
-        try:
-            return_val = False
-            for group in self.LEGIT_VIEWER_GROUPER_GROUPS:
-                if group in user_memberships:
-                    return_val = True
-                    break
-            log.debug( 'check_group() return_val, `{}`'.format(return_val) )
-        except Exception as e:
-            log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
+        return_val = False
+        for group in self.LEGIT_VIEWER_GROUPER_GROUPS:
+            if group in user_memberships:
+                return_val = True
+                break
+        log.debug( 'check_group() return_val, `{}`'.format(return_val) )
         return return_val
 
     def check_eppn( self, eppn ):
         """ Checks user's eppn.
             Called by validate_user() """
-        log.debug( 'starting check_eppn()' )
         return_val = False
         if eppn in self.LEGIT_VIEWER_EPPNS:
             return_val = True
