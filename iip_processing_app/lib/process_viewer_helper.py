@@ -70,12 +70,15 @@ class ShibChecker( object ):
         """ Checks user's grouper groups.
             Called by validate_user() """
         log.debug( 'starting check_group()' )
-        return_val = False
-        for group in self.LEGIT_VIEWER_GROUPER_GROUPS:
-            if group in user_memberships:
-                return_val = True
-                break
-        log.debug( 'check_group() return_val, `{}`'.format(return_val) )
+        try:
+            return_val = False
+            for group in self.LEGIT_VIEWER_GROUPER_GROUPS:
+                if group in user_memberships:
+                    return_val = True
+                    break
+            log.debug( 'check_group() return_val, `{}`'.format(return_val) )
+        except Exception as e:
+            log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
         return return_val
 
     def check_eppn( self, eppn ):
