@@ -53,6 +53,24 @@ def process_all( request ):
     return HttpResponse( 'process_all coming' )
 
 
+@csrf_exempt
+def update_processing_status( request ):
+    """ Updates status table, either with a bunch of items to be listed as 'enqueued' -- or with a single item status update.
+        Called by workers. """
+    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
+    resp = HttpResponseForbidden( '403 / Forbidden' )
+    if unicode( request.META.get('HTTP_HOST', '') ) in settings.ALLOWED_HOSTS:
+        ( to_process_dct, single_update_dct ) = process_status_recorder.check_for_data( request.body )
+        if to_process_dct:
+            resp = process_status_recorder.handle_enqueues( to_process_dct )
+        elif single_update_dct:
+            resp = process_status_recorder.handle_single_update( single_update_dct )
+    return resp
+
+
+### admin-access views ###
+
+
 def delete_solr_orphans( request ):
     """ Manages initial request to delete orphaned records from solr. """
     request.session['ids_to_delete'] = json.dumps( [] )
@@ -69,6 +87,7 @@ def delete_solr_orphans( request ):
 
 def process_solr_deletions( request ):
     """ Triggers actual deletion-processing.
+        Called by clicking the go-ahead-and-delete button in views.delete_solr_orphans()
         The POST requirement, combined with built-in csrf protection, is enough to ensure hits are valid. """
     resp = HttpResponseForbidden( '403 / Forbidden' )
     if request.method == 'POST':
@@ -78,19 +97,6 @@ def process_solr_deletions( request ):
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
 
-
-@csrf_exempt
-def update_processing_status( request ):
-    """ Updates status table. """
-    log.debug( 'request.__dict__, ```{}```'.format(pprint.pformat(request.__dict__)) )
-    resp = HttpResponseForbidden( '403 / Forbidden' )
-    if unicode( request.META.get('HTTP_HOST', '') ) in settings.ALLOWED_HOSTS:
-        ( to_process_dct, single_update_dct ) = process_status_recorder.check_for_data( request.body )
-        if to_process_dct:
-            resp = process_status_recorder.handle_enqueues( to_process_dct )
-        elif single_update_dct:
-            resp = process_status_recorder.handle_single_update( single_update_dct )
-    return resp
 
 def view_processing( request ):
     """ If shib headers ok, logs user in & redirects to admin view. """
