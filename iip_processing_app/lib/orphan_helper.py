@@ -16,8 +16,20 @@ class OrphanDeleter( object ):
 
     def __init__( self ):
         """ Settings. """
+        self.ADMINS = json.loads( os.environ['IIP_PRC__LEGIT_ADMINS_JSON'] )
         self.GIT_CLONED_DIR_PATH = unicode( os.environ['IIP_PRC__CLONED_INSCRIPTIONS_PATH'] )
         self.SOLR_URL = unicode( os.environ['IIP_PRC__SOLR_URL'] )
+
+    def validate_delete_request( self, eppn, dev_user, host ):
+        """ Validates admin request.
+            Called by views.delete_solr_orphans() """
+        validity = False
+        if eppn in self.ADMINS:
+            validity = True
+        elif dev_user in self.ADMINS and host == '127.0.0.1':
+            validity = True
+        log.debug( 'validity, `{}`'.format(validity) )
+        return validity
 
     def prep_data( self ):
         """ Prepares list of ids to be deleted from solr.

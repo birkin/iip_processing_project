@@ -92,19 +92,4 @@ class ProcessStatusRecorder( object ):
         resp = HttpResponse( '200 / OK' )
         return resp
 
-    # def handle_single_update( self, single_update_dct ):
-    #     """ Updates single entry processed status.
-    #         Called by views.update_processing_status() """
-    #     ( inscription_id, status_summary, status_detail ) = (
-    #         single_update_dct['inscription_id'], single_update_dct['status_summary'], single_update_dct['status_detail'] )
-    #     try:
-    #         process_status = Status.objects.get( inscription_id=inscription_id )
-    #     except Exception as e:
-    #         process_status = Status( inscription_id=inscription_id )
-    #     process_status.status_summary = status_summary
-    #     process_status.status_detail = status_detail
-    #     process_status.save()
-    #     resp = HttpResponse( '200 / OK' )
-    #     return resp
-
     ## end class ProcessStatusRecorder()
