@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 
 """
+Triggered by:
+-  views.gh_inscription_watcher() -> GHHelper.handle_inscription_update()
 Contains:
 - Puller(), to call git-pull.
 - StatusBackupper(), to make and save the local and gist backups.

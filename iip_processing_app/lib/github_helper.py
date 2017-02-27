@@ -11,7 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class GHValidator( object ):
-    """ Contains functions to validate incoming request. """
+    """ Contains functions to validate incoming github request.
+        Helper for views.gh_inscription_watcher() """
 
     def __init__( self ):
         self.AUTH_USERNAME = unicode( os.environ['IIP_PRC__BASIC_AUTH_USERNAME'] )
@@ -75,7 +76,8 @@ class GHValidator( object ):
 
 
 class GHHelper( object ):
-    """ Contains support functions for views.git_watcher() """
+    """ Contains functions to process incoming github request.
+        Helper for views.gh_inscription_watcher() """
 
     def __init__( self ):
         """ Grabs env-vars.
@@ -93,15 +95,6 @@ class GHHelper( object ):
         processor.run_call_git_pull( to_process_dct )
         self.trigger_dev_if_production( request_body, host, submitted_signature )
         return
-
-    # def handle_inscription_update( self, request_body, host ):
-    #     """ Enqueues first of a series of processing jobs. """
-    #     log.debug( 'request_body, ```{}```'.format(request_body) )
-    #     data_dct = json.loads( request_body )
-    #     to_process_dct = self.prep_files_to_process( data_dct['commits'] )
-    #     processor.run_call_git_pull( to_process_dct )
-    #     self.trigger_dev_if_production( request_body, host )
-    #     return
 
     def prep_files_to_process( self, commits_lst ):
         """ Prepares the data-dict to be sent to the first rq job.
@@ -155,21 +148,4 @@ class GHHelper( object ):
         log.debug( 'leaving' )
         return
 
-    # def trigger_dev_if_production( self, request_body, host ):
-    #     """ Sends github `data` to dev-server (which github can't hit) if this is the production-server.
-    #         Called by handle_inscription_update() """
-    #     log.debug( 'starting' )
-    #     if host == self.PRODUCTION_HOSTNAME:
-    #         log.debug( 'gonna hit dev' )
-    #         try:
-    #             r = requests.post( self.DEV_URL, data=request_body, auth=(self.AUTH_USERNAME, self.AUTH_PASSWORD), timeout=10 )
-    #             log.debug( 'status_code, `{}`'.format(r.status_code) )
-    #         except Exception as e:
-    #             log.error( 'exception, ```{}```'.format(unicode(repr(e))) )
-    #     log.debug( 'leaving' )
-    #     return
-
     ## end class GHHelper()
-
-
-

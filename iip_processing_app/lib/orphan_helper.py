@@ -12,7 +12,8 @@ indexer = Indexer()
 
 
 class OrphanDeleter( object ):
-    """ Contains funcions for removing orphaned entries from solr. """
+    """ Contains functions for removing orphaned entries from solr.
+        Helper for views.delete_solr_orphans() """
 
     def __init__( self ):
         """ Settings. """

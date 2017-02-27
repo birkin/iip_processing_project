@@ -13,6 +13,8 @@ log = logging.getLogger(__name__)
 
 
 class UserGrabber(object):
+    """ Grabs user object from shib or local-dev.
+        Helper for views.view_processing() """
 
     def __init__( self ):
         self.LEGIT_VIEWER_USER = unicode( os.environ['IIP_PRC__LEGIT_QUEUE_VIEWER_USER'] )
@@ -44,6 +46,8 @@ class UserGrabber(object):
 
 
 class ShibChecker( object ):
+    """ Checks shib for valid eppn or group.
+        Helper for views.view_processing() """
 
     def __init__( self ):
         self.LEGIT_VIEWER_GROUPER_GROUPS = json.loads( os.environ['IIP_PRC__LEGIT_QUEUE_VIEWER_GROUPS_JSON'] )
@@ -116,7 +120,8 @@ class ShibChecker( object ):
 
 
 class ProcessStatusRecorder( object ):
-    """ Contains functions for recording processed-status. """
+    """ Contains functions for recording processed-status.
+        Helper for views.view_processing() """
 
     def __init__( self ):
         """ Settings. """
