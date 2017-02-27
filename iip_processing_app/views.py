@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
-# from iip_processing_app.lib.admin_authenticator import AdminValidator
 from iip_processing_app.lib.admin_helper import ProcessStatusRecorder
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.orphan_helper import OrphanDeleter
@@ -21,7 +20,6 @@ from iip_processing_app.models import Status
 log = logging.getLogger(__name__)
 github_validator = GHValidator()
 github_helper = GHHelper()
-# admin_validator = AdminValidator()
 orphan_deleter = OrphanDeleter()
 process_status_recorder = ProcessStatusRecorder()
 user_grabber = UserGrabber()
@@ -72,20 +70,6 @@ def update_processing_status( request ):
 ### admin-access views ###
 
 
-# def delete_solr_orphans( request ):
-#     """ Manages initial request to delete orphaned records from solr. """
-#     request.session['ids_to_delete'] = json.dumps( [] )
-#     resp = HttpResponseForbidden( '403 / Forbidden' )
-#     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
-#     if admin_validator.validate_admin_request( eppn, dev_user, host ):
-#         data = orphan_deleter.prep_data()
-#         request.session['ids_to_delete'] = json.dumps( data )
-#         context = orphan_deleter.prep_context( data )
-#         resp = render( request, u'iip_processing_templates/show_proposed_deletions.html', context )
-#     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
-#     return resp
-
-
 def delete_solr_orphans( request ):
     """ Manages initial request to delete orphaned records from solr. """
     request.session['ids_to_delete'] = json.dumps( [] )
@@ -98,6 +82,7 @@ def delete_solr_orphans( request ):
         resp = render( request, u'iip_processing_templates/show_proposed_deletions.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
+
 
 def process_solr_deletions( request ):
     """ Triggers actual deletion-processing.
