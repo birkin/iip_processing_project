@@ -23,7 +23,8 @@ class OrphanDeleter( object ):
 
     def validate_delete_request( self, eppn, dev_user, host ):
         """ Validates admin request.
-            Called by views.delete_solr_orphans() """
+            Called by views.delete_solr_orphans(), and, weirdly, by process_all_helper.AllProcessorHelper.validate_request()
+            TODO: merge into a common helper class/function. """
         validity = False
         if eppn in self.ADMINS:
             validity = True
@@ -38,14 +39,13 @@ class OrphanDeleter( object ):
         file_system_ids = self.build_directory_inscription_ids()
         solr_inscription_ids = self.build_solr_inscription_ids()
         orphans = self.build_orphan_list( file_system_ids, solr_inscription_ids )
-        # orphans = [ 'aaa', 'bbb' ]
-        # orphans = []
         log.debug( 'orphans, ```{}```'.format(pprint.pformat(orphans)) )
         return orphans
 
     def build_directory_inscription_ids( self ):
         """ Returns list of file-system ids.
-            Called by prep_data(). """
+            Called by prep_data(), and, oddly, by process_all_helper.AllProcessorHelper.validate_request()
+            TODO: merge into a common helper class/function. """
         inscription_paths = glob.glob( '{}/epidoc-files/*.xml'.format(self.GIT_CLONED_DIR_PATH) )
         log.debug( 'inscription_paths[0:3], ```{}```'.format(pprint.pformat(inscription_paths[0:3])) )
         directory_inscription_ids = []
