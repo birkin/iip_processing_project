@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-import json, logging, os
+import json, logging, os, pprint
 from iip_processing_app.lib.orphan_helper import OrphanDeleter
 from iip_processing_app.lib.processor import Puller
 
@@ -32,6 +32,13 @@ class AllProcessorHelper(object):
             Called by views.process_all() """
         puller.call_git_pull()
         file_system_ids = helper.build_directory_inscription_ids()
-        file_system_ids = file_system_ids[0:2]
-        log.debug( 'len(file_system_ids), `%s`' % len(file_system_ids) )
+        file_system_ids = file_system_ids[0:2]  # TEMP; for testing
+        # log.debug( 'len(file_system_ids), `%s`' % len(file_system_ids) )
+        log.debug( 'file_system_ids, ```%s```' % pprint.pformat(file_system_ids) )
         return file_system_ids
+
+    def enqueue_jobs( self, id_lst ):
+        """ Enqueues jobs.
+            Called by views.process_all() """
+        log.debug( 'will likely prep the data, then call processor.run_backup_statuses( files_to_update, files_to_remove )' )
+        pass

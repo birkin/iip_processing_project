@@ -112,7 +112,7 @@ def process_all( request ):
     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if all_processor.validate_request( eppn, dev_user, host ):
         data_lst = all_processor.prep_data()
-        all_processor.run_process_all( data_lst )
+        all_processor.enqueue_jobs( data_lst )
         context = all_processor.prep_context()
         resp = render( request, u'iip_processing_templates/process_all_response.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
