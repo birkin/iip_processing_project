@@ -10,9 +10,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
-# from iip_processing_app.lib.admin_helper import ProcessStatusRecorder
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.orphan_helper import OrphanDeleter
+from iip_processing_app.lib.process_all_helper import AllProcessorHelper
 from iip_processing_app.lib.process_viewer_helper import UserGrabber, ProcessStatusRecorder
 from iip_processing_app.models import Status
 
@@ -21,6 +21,7 @@ log = logging.getLogger(__name__)
 github_validator = GHValidator()
 github_helper = GHHelper()
 orphan_deleter = OrphanDeleter()
+all_processor = AllProcessorHelper()
 process_status_recorder = ProcessStatusRecorder()
 user_grabber = UserGrabber()
 
