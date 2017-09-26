@@ -48,10 +48,6 @@ def gh_inscription_watcher( request ):
     return resp
 
 
-def process_all( request ):
-    return HttpResponse( 'process_all coming' )
-
-
 @csrf_exempt
 def update_processing_status( request ):
     """ Updates status table, either with a bunch of items to be listed as 'enqueued' -- or with a single item status update.
@@ -107,3 +103,20 @@ def view_processing( request ):
     url = reverse('admin:iip_processing_app_status_changelist' )
     log.debug( 'redirect url to admin, ```{}```'.format(url) )
     return HttpResponseRedirect( url )  ## TODO: add shib logout (via redirecting to shib-logout url, then redirecting to the above admin url)
+
+
+def process_all( request ):
+    """ Manages full-reindexing. """
+    request.session['process_all_ids'] = json.dumps( [] )
+    resp = HttpResponseForbidden( '403 / Forbidden' )
+    ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
+    if all_processor.validate_request( eppn, dev_user, host ):
+        data_lst = all_processor.prep_data()
+        request.session['process_all_ids'] = json.dumps( data_lst )
+        context = all_processor.prep_context()
+        resp = render( request, u'iip_processing_templates/process_all_response.html', context )
+    log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
+    return resp
+    return HttpResponse( 'process_all coming' )
+
+## EOF

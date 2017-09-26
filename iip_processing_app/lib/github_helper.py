@@ -88,7 +88,8 @@ class GHHelper( object ):
         self.PRODUCTION_HOSTNAME = unicode( os.environ['IIP_PRC__PRODUCTION_HOSTNAME'] )
 
     def handle_inscription_update( self, request_body, host, submitted_signature ):
-        """ Enqueues first of a series of processing jobs. """
+        """ Enqueues first of a series of processing jobs.
+            Called by views.gh_inscription_watcher() """
         log.debug( 'request_body, ```{}```'.format(request_body) )
         data_dct = json.loads( request_body )
         to_process_dct = self.prep_files_to_process( data_dct['commits'] )
