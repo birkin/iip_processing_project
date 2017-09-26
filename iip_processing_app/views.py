@@ -108,17 +108,16 @@ def view_processing( request ):
 
 def process_all( request ):
     """ Manages full-reindexing. """
-    request.session['process_all_ids'] = json.dumps( [] )
     resp = HttpResponseForbidden( '403 / Forbidden' )
     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if all_processor.validate_request( eppn, dev_user, host ):
         data_lst = all_processor.prep_data()
-        request.session['process_all_ids'] = json.dumps( data_lst )
+        all_processor.run_process_all( data_lst )
         context = all_processor.prep_context()
         resp = render( request, u'iip_processing_templates/process_all_response.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
-    return HttpResponse( 'process_all coming' )
+    # return HttpResponse( 'process_all coming' )
 
 
 ## EOF

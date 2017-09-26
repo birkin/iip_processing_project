@@ -319,7 +319,7 @@ process_status_updater = ProcessStatusUpdater()
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
             Eventually spawns a call to indexer.run_update_index() which handles each result found.
-        Called by views.gh_inscription_watcher(). """
+        Called by github_helper.GHHelper.handle_inscription_update(). """
     log.debug( 'to_process_dct, ```{}```'.format(pprint.pformat(to_process_dct)) )  # keys: [ 'files_removed', 'files_updated', 'timestamp']
     time.sleep( 2 )  # let any existing in-process pull finish
     puller.call_git_pull()

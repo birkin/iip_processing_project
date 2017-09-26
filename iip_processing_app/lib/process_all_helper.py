@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 
 import json, logging, os
+from iip_pro
+1.0
 
 
 log = logging.getLogger(__name__)
@@ -26,3 +28,11 @@ class AllProcessorHelper(object):
             validity = True
         log.debug( 'validity, `%s`' % validity )
         return validity
+
+    def prep_data( self ):
+        """ Prepares list of ids to be indexed.
+            Called by views.process_all() """
+        self.call_git_pull()
+        file_system_ids = self.build_directory_inscription_ids()
+        log.debug( 'len(file_system_ids), `%`' % len(file_system_ids) )
+        return file_system_ids
