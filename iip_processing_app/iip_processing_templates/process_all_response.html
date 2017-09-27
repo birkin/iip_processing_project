@@ -1,0 +1,46 @@
+{% extends "iip_processing_templates/base.html" %}
+
+{% block page_title %}
+process-all inscriptions
+{% endblock page_title %}
+
+
+{% block content %}
+
+<style type="text/css">
+    #processing_content {
+        margin-top: 4em;
+    }
+    #listing {
+         margin-top: 2em;
+    }
+    ul {
+        list-style-type: square;
+        margin-left: 2em;
+        font-size: 100%;
+    }
+    li {
+        margin-top: .5em;
+    }
+    form {
+        margin-top: 2em;
+    }
+    hr {
+        margin-top: 2em;
+    }
+</style>
+
+<div id="processing_content">
+
+    <h1> Processing underway... </h1>
+
+    <ul>
+        <li>All {{ count_files_to_process }} inscriptions will be processed.</li>
+        <li>You can monitor progress via <a href="{{ view_processing_url }}">the view-processing link</a>.</li>
+    </ul>
+
+</div>
+
+<hr/>
+
+{% endblock content %}
