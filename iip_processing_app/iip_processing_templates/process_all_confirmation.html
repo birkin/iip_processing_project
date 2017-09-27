@@ -1,0 +1,45 @@
+{% extends "iip_processing_templates/base.html" %}
+
+{% block page_title %}
+process-all inscriptions
+{% endblock page_title %}
+
+
+{% block content %}
+
+<style type="text/css">
+    #processing_content {
+        margin-top: 4em;
+    }
+    #listing {
+         margin-top: 2em;
+    }
+    ul {
+        list-style-type: square;
+        margin-left: 2em;
+        font-size: 100%;
+    }
+    li {
+        margin-top: .5em;
+    }
+    form {
+        margin-top: 2em;
+    }
+    hr {
+        margin-top: 2em;
+    }
+</style>
+
+<div id="processing_content">
+
+    <h1> Process all confirmation... </h1>
+
+    <form method="post" action="http://127.0.0.1/iip_processor/process_all/">{% csrf_token %}
+        <input id="confirmation_button" type="submit" value="Go ahead and process all inscriptions">
+    </form>
+
+</div>
+
+<hr/>
+
+{% endblock content %}
