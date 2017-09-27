@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 github_validator = GHValidator()
 github_helper = GHHelper()
 orphan_deleter = OrphanDeleter()
-all_processor = AllProcessorHelper()
 process_status_recorder = ProcessStatusRecorder()
 user_grabber = UserGrabber()
 
@@ -107,17 +106,21 @@ def view_processing( request ):
 
 
 def process_all( request ):
-    """ Manages full-reindexing. """
+    """ Manages full-reindexing.
+        The POST requirement, combined with built-in csrf protection, is enough to ensure hits are valid. """
+    all_processor = AllProcessorHelper()
     resp = HttpResponseForbidden( '403 / Forbidden' )
-    ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
-    if all_processor.validate_request( eppn, dev_user, host ):
+    if request.method == 'GET':
+        ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
+        if all_processor.validate_request( eppn, dev_user, host ):
+            resp = render( request, 'iip_processing_templates/process_all_confirmation.html', {'process_all_url': reverse('process_all_url')} )
+    else:
         data_lst = all_processor.prep_data()
         all_processor.enqueue_jobs( data_lst )
-        context = all_processor.prep_context()
-        resp = render( request, u'iip_processing_templates/process_all_response.html', context )
+        context = all_processor.prep_confirmation_context()
+        resp = render( request, 'iip_processing_templates/process_all_response.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
-    # return HttpResponse( 'process_all coming' )
 
 
 ## EOF
