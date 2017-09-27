@@ -114,12 +114,12 @@ def process_all( request ):
     ( resp, eppn, dev_user, host ) = ( HttpResponseForbidden('403 / Forbidden'), request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if request.method == 'GET':
         if all_processor.validate_request( eppn, dev_user, host ):
-            resp = render( request, 'iip_processing_templates/process_all_confirmation.html', {'process_all_url': reverse('process_all_url')} )
+            resp = render( request, 'iip_processing_templates/process_all_confirmation.html', {} )
     elif request.method == 'POST':
         log.debug( 'here' )
         data_lst = all_processor.prep_data()
         all_processor.enqueue_jobs( data_lst )
-        context = all_processor.prep_confirmation_context( len(data_lst) )
+        context = all_processor.prep_summary_context( len(data_lst) )
         resp = render( request, 'iip_processing_templates/process_all_response.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp

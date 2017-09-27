@@ -46,7 +46,7 @@ class AllProcessorHelper(object):
         log.debug( 'jobs enqueued' )
         return
 
-    def prep_confirmation_context( self, count_files_to_process ):
+    def prep_summary_context( self, count_files_to_process ):
         """ Prepares context.
             Called by views.process_all() """
         context = {
