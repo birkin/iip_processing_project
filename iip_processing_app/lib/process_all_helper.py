@@ -3,13 +3,14 @@
 from __future__ import unicode_literals
 
 import json, logging, os, pprint
+from iip_processing_app.lib import processor
 from iip_processing_app.lib.orphan_helper import OrphanDeleter
-from iip_processing_app.lib.processor import Puller
+# from iip_processing_app.lib.processor import Puller
 
 
 log = logging.getLogger(__name__)
 helper = OrphanDeleter()  # yeah, weird, see function's TODO
-puller = Puller()
+puller = processor.Puller()
 
 
 class AllProcessorHelper(object):
@@ -33,12 +34,14 @@ class AllProcessorHelper(object):
         puller.call_git_pull()
         file_system_ids = helper.build_directory_inscription_ids()
         file_system_ids = file_system_ids[0:2]  # TEMP; for testing
-        # log.debug( 'len(file_system_ids), `%s`' % len(file_system_ids) )
+        log.debug( 'len(file_system_ids), `%s`' % len(file_system_ids) )
         log.debug( 'file_system_ids, ```%s```' % pprint.pformat(file_system_ids) )
         return file_system_ids
 
     def enqueue_jobs( self, id_lst ):
         """ Enqueues jobs.
             Called by views.process_all() """
-        log.debug( 'will likely prep the data, then call processor.run_backup_statuses( files_to_update, files_to_remove )' )
-        pass
+        ( files_to_update, files_to_remove ) = ( id_lst, [] )  # no files to remove; just preparing the proper data format expected
+        processor.run_backup_statuses( files_to_update, files_to_remove )
+        log.debug( 'jobs enqueued' )
+        return
