@@ -115,7 +115,8 @@ def process_all( request ):
     if request.method == 'GET':
         if all_processor.validate_request( eppn, dev_user, host ):
             resp = render( request, 'iip_processing_templates/process_all_confirmation.html', {'process_all_url': reverse('process_all_url')} )
-    else:
+    elif request.method == 'POST':
+        log.debug( 'here' )
         data_lst = all_processor.prep_data()
         all_processor.enqueue_jobs( data_lst )
         context = all_processor.prep_confirmation_context( len(data_lst) )
