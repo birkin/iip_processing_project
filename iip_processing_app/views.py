@@ -110,6 +110,7 @@ def view_processing( request ):
 def process_all( request ):
     """ Manages full-reindexing.
         The POST requirement, combined with the built-in csrf protection, is enough to ensure hits are valid. """
+    log.debug( 'request.META, ```%s```' % pprint.pformat(request.META) )
     ( resp, eppn, dev_user, host ) = ( HttpResponseForbidden('403 / Forbidden'), request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
     if request.method == 'GET':
         if all_processor.validate_request( eppn, dev_user, host ):
