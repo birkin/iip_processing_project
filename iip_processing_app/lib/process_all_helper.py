@@ -20,7 +20,6 @@ class AllProcessorHelper(object):
 
     def __init__( self ):
         self.ADMINS = json.loads( os.environ['IIP_PRC__LEGIT_ADMINS_JSON'] )
-        self.count_files_to_process = 0
 
     def validate_request( self, eppn, dev_user, host ):
         """ Validates admin request.
@@ -36,8 +35,6 @@ class AllProcessorHelper(object):
         puller.call_git_pull()
         file_system_ids = helper.build_directory_inscription_ids()
         file_system_ids = file_system_ids[0:2]  # TEMP; for testing
-        self.count_files_to_process = len( file_system_ids )
-        log.debug( 'self.count_files_to_process, `%s`' % self.count_files_to_process )
         log.debug( 'file_system_ids, ```%s```' % pprint.pformat(file_system_ids) )
         return file_system_ids
 
@@ -49,12 +46,14 @@ class AllProcessorHelper(object):
         log.debug( 'jobs enqueued' )
         return
 
-    def prep_confirmation_context( self ):
+    def prep_confirmation_context( self, count_files_to_process ):
         """ Prepares context.
             Called by views.process_all() """
         context = {
-            'count_files_to_process': self.count_files_to_process,
+            'count_files_to_process': count_files_to_process,
             'view_processing_url': reverse( 'view_processing_url' )
         }
         log.debug( 'context, ```%s```' % pprint.pformat(context) )
         return context
+
+    ## end class AllProcessorHelper()
