@@ -378,4 +378,3 @@ def run_update_index_file( inscription_id, solr_xml ):
     log.debug( 'partial solr_xml, ```{}```'.format(solr_xml[0:100]) )
     indexer.update_entry( inscription_id, solr_xml )
     log.debug( 'done processing file' )
-
