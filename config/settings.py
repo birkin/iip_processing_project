@@ -135,14 +135,14 @@ LOGGING = {
     },
     'handlers': {
         'logfile': {
-            'level':'DEBUG',
-            'class':'logging.FileHandler',  # note: configure server to use system's log-rotate to avoid permissions issues
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',  # note: configure server to use system's log-rotate to avoid permissions issues
             'filename': os.environ.get(u'IIP_PRC__LOG_PATH'),
             'formatter': 'standard',
         },
-        'console':{
-            'level':'DEBUG',
-            'class':'logging.StreamHandler',
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
     },
@@ -154,4 +154,3 @@ LOGGING = {
         },
     }
 }
-

@@ -7,7 +7,7 @@ Django settings for iip_processing_project for travis-ci.org
 Environmental variables are set in run_travis_tests.py
 """
 
-import json, logging, os
+# import json, logging, os
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
