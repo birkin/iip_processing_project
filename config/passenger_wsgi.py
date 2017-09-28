@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+
+import os, sys
+
 """
 WSGI config for iip_processing_project.
 
@@ -20,7 +23,6 @@ stuff
     env_iip_prc
 """
 
-import os, pprint, sys
 
 ## become self-aware, padawan
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -37,8 +39,8 @@ execfile( ACTIVATE_FILE, dict(__file__=ACTIVATE_FILE) )
 
 ## sys.path additions
 for entry in [PROJECT_DIR, PROJECT_ENCLOSING_DIR, SITE_PACKAGES_DIR]:
- if entry not in sys.path:
-   sys.path.append( entry )
+    if entry not in sys.path:
+        sys.path.append( entry )
 
 ## environment additions
 os.environ[u'DJANGO_SETTINGS_MODULE'] = SETTINGS_MODULE  # so django can access its settings
