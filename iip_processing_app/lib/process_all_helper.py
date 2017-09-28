@@ -34,7 +34,7 @@ class AllProcessorHelper(object):
             Called by views.process_all() """
         puller.call_git_pull()
         file_system_ids = helper.build_directory_inscription_ids()
-        file_system_ids = file_system_ids[0:2]  # TEMP; for testing
+        # file_system_ids = file_system_ids[0:2]  # TEMP; for testing
         log.debug( 'file_system_ids, ```%s```' % pprint.pformat(file_system_ids) )
         return file_system_ids
 
