@@ -89,7 +89,7 @@ class OrphanDeleter( object ):
             'data': data,
             'datetime': datetime.datetime.now(),
             'inscription_dir_path': self.GIT_CLONED_DIR_PATH
-            }
+        }
         log.debug( 'context, ```{}```'.format(pprint.pformat(context)) )
         return context
 

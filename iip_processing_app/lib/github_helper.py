@@ -129,7 +129,7 @@ class GHHelper( object ):
         cleaned = []
         dir_segment = 'epidoc-files/'
         for entry in initial_list:
-            if dir_segment in entry:  ## good inscription
+            if dir_segment in entry:  # good inscription
                 cleaned.append( entry.replace(dir_segment, '').replace('.xml', '') )
         log.debug( 'cleaned, ```{}```'.format(cleaned) )
         return cleaned
