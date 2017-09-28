@@ -2,19 +2,17 @@
 
 from __future__ import unicode_literals
 
-import datetime, json, logging, os, pprint
+import datetime, json, logging, pprint
 from django.conf import settings
 from django.contrib.auth import login as django_login
-from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.orphan_helper import OrphanDeleter
 from iip_processing_app.lib.process_all_helper import AllProcessorHelper
 from iip_processing_app.lib.process_viewer_helper import UserGrabber, ProcessStatusRecorder
-from iip_processing_app.models import Status
 
 
 log = logging.getLogger(__name__)
@@ -104,7 +102,7 @@ def view_processing( request ):
         django_login(request, user )
     url = reverse('admin:iip_processing_app_status_changelist' )
     log.debug( 'redirect url to admin, ```{}```'.format(url) )
-    return HttpResponseRedirect( url )  ## TODO: add shib logout (via redirecting to shib-logout url, then redirecting to the above admin url)
+    return HttpResponseRedirect( url )  # TODO: add shib logout (via redirecting to shib-logout url, then redirecting to the above admin url)
 
 
 def process_all( request ):
