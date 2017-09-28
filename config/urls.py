@@ -14,9 +14,9 @@ urlpatterns = [
 
     url( r'^admin/', include(admin.site.urls) ),
 
-    url( r'^info/$',  views.info, name='info_url' ),
+    url( r'^info/$', views.info, name='info_url' ),
 
-    url( r'^gh_inscription_watcher/$',  views.gh_inscription_watcher, name='gh_inscription_watcher_url' ),
+    url( r'^gh_inscription_watcher/$', views.gh_inscription_watcher, name='gh_inscription_watcher_url' ),
 
     url( r'^process_all/$', views.process_all, name=u'process_all_url' ),
 
@@ -27,6 +27,6 @@ urlpatterns = [
 
     url( r'^view_processing/$', views.view_processing, name='view_processing_url' ),
 
-    url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
+    url( r'^$', RedirectView.as_view(pattern_name='info_url') ),
 
-    ]
+]
