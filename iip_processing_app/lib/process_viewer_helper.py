@@ -27,7 +27,7 @@ class UserGrabber(object):
         if shib_checker.validate_user( meta_dct ):
             log.debug( 'validated via shib' )
             user = self.grab_good_user()
-        elif meta_dct['SERVER_NAME'] == '127.0.0.1' and settings.DEBUG == True:
+        elif meta_dct['SERVER_NAME'] is '127.0.0.1' and settings.DEBUG is True:
             log.debug( 'validated via localdev' )
             user = self.grab_good_user()
         else:
@@ -113,7 +113,7 @@ class ShibChecker( object ):
             # 'patron_barcode': meta_dct.get( 'Shibboleth-brownBarCode', '' ),
             # 'phone': meta_dct.get( 'Shibboleth-phone', 'unavailable' ),  # valid?
             # 'title': meta_dct.get( 'Shibboleth-title', '' ),
-            }
+        }
         return shib_dct
 
     ## end class ShibChecker()
@@ -140,7 +140,6 @@ class ProcessStatusRecorder( object ):
             Called by check_for_data() """
         try:
             data_dct = json.loads( request_body )
-            to_process_dct = data_dct.get( 'to_process_dct', None )
         except:
             data_dct = {}
         log.debug( 'data_dct, ```{}```'.format(pprint.pformat(data_dct)) )
@@ -164,7 +163,7 @@ class ProcessStatusRecorder( object ):
                 'inscription_id': data_dct['inscription_id'],
                 'status_summary': data_dct['status_summary'],
                 'status_detail': data_dct['status_detail'],
-                }
+            }
         except:
             single_update_dct = {}
         log.debug( 'single_update_dct, ```{}```'.format(pprint.pformat(single_update_dct)) )
@@ -185,7 +184,8 @@ class ProcessStatusRecorder( object ):
             Called by handle_enqueues(), and by handle_single_update() """
         try:
             process_status = Status.objects.get( inscription_id=inscription_id )
-        except Exception as e:
+        except Exception:
+            log.debug( 'creating new Status instance' )
             process_status = Status( inscription_id=inscription_id )
         process_status.status_summary = new_status_summary
         process_status.status_detail = new_status_detail

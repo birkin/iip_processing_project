@@ -13,7 +13,7 @@ Contains:
 - job-queue caller functions.
 """
 
-import datetime, json, logging, logging.config, os, pprint, shutil, time
+import datetime, json, logging, logging.config, os, pprint, time
 import envoy, redis, requests, rq, solr
 from lxml import etree
 
@@ -57,7 +57,7 @@ class Puller( object ):
             'std_err': envoy_response.std_err.decode(u'utf-8'),
             'command': envoy_response.command,  # list
             'history': envoy_response.history  # list
-            }
+        }
         log.debug( 'envoy response, ```{}```'.format(pprint.pformat(track_dct)) )
         return track_dct
 
@@ -105,7 +105,7 @@ class StatusBackupper( object ):
         status_dct = {
             'counts': { 'approved': 0, 'to_approve': 0, 'to_correct': 0, 'total': 0 },
             'statuses': {}
-            }
+        }
         status_dct = self.run_loop( response_dct, status_dct )
         log.debug( 'status_dct, ```{}```'.format(pprint.pformat(status_dct)) )
         return status_dct
@@ -133,9 +133,10 @@ class StatusBackupper( object ):
             'description': '{} -- iip display statuses'.format(unicode(datetime.datetime.now())),
             'files': {
                 'iip_display_statuses.json': { 'content': status_json },
-              }
-            } )
+            }
+        } )
         r = requests.patch( url=self.STATUSES_GIST_URL, auth=auth, data=json_payload )
+        log.debug( 'patch result, `%s`' % r.status_code )
         return
 
     def save_locally( self, status_json ):
@@ -155,7 +156,7 @@ class StatusBackupper( object ):
             Called by make_backup() """
         log.debug( 'starting old-backup deletion' )
         now = time.time()
-        seconds_in_day = 60*60*24
+        seconds_in_day = 60 * 60 * 24
         timeframe_days = seconds_in_day * self.DISPLAY_STATUSES_BACKUP_TIMEFRAME_IN_DAYS
         backup_files = os.listdir( self.DISPLAY_STATUSES_BACKUP_DIR )
         backup_files = [ unicode(x) for x in backup_files ]
@@ -316,6 +317,7 @@ prepper = Prepper()
 indexer = Indexer()
 process_status_updater = ProcessStatusUpdater()
 
+
 def run_call_git_pull( to_process_dct ):
     """ Initiates a git pull update.
             Eventually spawns a call to indexer.run_update_index() which handles each result found.
@@ -331,6 +333,7 @@ def run_call_git_pull( to_process_dct ):
         log.debug( 'no files to update; done' )
     return
 
+
 def run_update_process_tracker( to_process_dct ):
     """ Updates the process-tracker table with enqueued status.
         Called by run_call_git_pull(). """
@@ -339,6 +342,7 @@ def run_update_process_tracker( to_process_dct ):
         func=u'iip_processing_app.lib.processor.run_backup_statuses',
         kwargs={u'files_to_update': to_process_dct['files_updated'], u'files_to_remove': to_process_dct['files_removed']} )
     return
+
 
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
@@ -355,12 +359,14 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             func='iip_processing_app.lib.processor.run_prep_file',
             kwargs={'file_id': file_to_update, 'status_json': status_json} )
 
+
 def run_remove_index_file( file_id ):
     """ Removes file from index.
         Called by run_backup_statuses() """
     log.debug( 'file_id, ```{}```'.format(file_id) )
     indexer.delete_entry( file_id )
     log.debug( 'done processing file' )
+
 
 def run_prep_file( file_id, status_json ):
     """ Prepares file for indexing.
@@ -371,6 +377,7 @@ def run_prep_file( file_id, status_json ):
     q.enqueue_call(
         func='iip_processing_app.lib.processor.run_update_index_file',
         kwargs={'inscription_id': file_id, 'solr_xml': solr_xml} )
+
 
 def run_update_index_file( inscription_id, solr_xml ):
     """ Updates index with new or changed info.
