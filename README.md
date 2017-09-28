@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/birkin/iip_processing_project.svg?branch=master)](https://travis-ci.org/birkin/iip_processing_project)
+[![Build Status](https://travis-ci.org/Brown-University-Library/iip_processing_project.svg?branch=master)](https://travis-ci.org/Brown-University-Library/iip_processing_project)
 
 ### about
 
