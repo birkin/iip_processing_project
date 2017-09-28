@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 """ Contains tests for git-pulls and rq processing. """
 
-import json, logging, os, time
+import logging, os, time
 import redis, requests, rq
 from django.test import TestCase
 from iip_processing_app.lib import processor
@@ -35,14 +35,14 @@ class PrepperOtherTest(TestCase):
         self.assertEqual(
             True,
             u'Κύριε' in unicode_doc,
-            )
+        )
 
     def test_call_git_pull(self):
         """ Checks for successful pull. """
         self.assertEqual(
             0,  # 0 means no problems; 1 means a problem
             puller.call_git_pull()
-            )
+        )
 
     def test_run_call_git_pull(self):
         """ Triggers processing for processor.run_call_git_pull(); checks for no failed jobs. """

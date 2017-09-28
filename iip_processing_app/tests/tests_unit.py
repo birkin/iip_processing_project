@@ -4,9 +4,7 @@ from __future__ import unicode_literals
 
 """ Contains travis-ci.org friendly tests. """
 
-import base64, hashlib, hmac, json, logging, os, time
-import requests
-from django.core.urlresolvers import reverse
+import base64, json, logging, os
 from django.test import TestCase
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.processor import Prepper, StatusBackupper
@@ -55,7 +53,8 @@ class GHValidatorTest(TestCase):
         self.assertEqual(
             { 'received_username': 'username_foo', 'received_password': 'password_bar' },
             gh_validator.parse_http_basic_auth( basic_auth_string )
-            )
+        )
+
     def test_parse_signature(self):
         """ Checks parsing of github's X-Hub-Signature header.
             Note: hmac requires a byte-string secret. """
@@ -66,7 +65,7 @@ class GHValidatorTest(TestCase):
         self.assertEqual(
             dummy_signature,
             gh_validator.determine_signature( dummy_secret, dummy_payload  )
-            )
+        )
 
 
 class GitHubResponseParseTest(TestCase):
@@ -107,7 +106,7 @@ class GitHubResponseParseTest(TestCase):
         self.assertEqual(
             ( [], [u'aaa123', u'abur0001'], [] ),  # added, modified, removed
             gh_helper.examine_commits( commits_list )
-            )
+        )
 
 
 class StatusBackupperTest(TestCase):
@@ -136,22 +135,23 @@ class StatusBackupperTest(TestCase):
                     u'rows': u'6000',
                     u'wt': u'json'},
                 u'status': 0}
-            }
-        self.assertEqual( {
-            u'counts': {
-                u'approved': 6, u'to_approve': 1, u'to_correct': 1, u'total': 8},
-            u'statuses': {
-                u'abil0001': u'approved',
-                u'abur0001': u'approved',
-                u'ahma0001': u'approved',
-                u'ahma0003': u'to_correct',
-                u'akas0001': u'approved',
-                u'akas0002': u'approved',
-                u'masa481': u'approved',
-                u'tdor0004': u'to_approve'}
+        }
+        self.assertEqual(
+            {
+                u'counts': {
+                    u'approved': 6, u'to_approve': 1, u'to_correct': 1, u'total': 8},
+                u'statuses': {
+                    u'abil0001': u'approved',
+                    u'abur0001': u'approved',
+                    u'ahma0001': u'approved',
+                    u'ahma0003': u'to_correct',
+                    u'akas0001': u'approved',
+                    u'akas0002': u'approved',
+                    u'masa481': u'approved',
+                    u'tdor0004': u'to_approve'}
             },
             stts_bckppr.make_status_dct( response_dct )
-            )
+        )
 
     ## end class StatusBackupperTest()
 
@@ -208,6 +208,6 @@ Judaea. Bethennim (Khirbet Abu Rish), in the church complex, Room A.
         self.assertEqual(
             True,
             '<field name="display_status">foo</field>' in updated_xml
-            )
+        )
 
     ## end class PrepperUnitTest()
