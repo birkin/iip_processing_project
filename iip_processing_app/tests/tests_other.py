@@ -24,8 +24,8 @@ class PrepperOtherTest(TestCase):
     def setUp(self):
         self.queue_name = unicode( os.environ['IIP_PRC__QUEUE_NAME'] )
 
-    def test_transform_xml(self):
-        """ Checks transform.
+    def test_good_transform_xml(self):
+        """ Checks transform with good source-xml and good-stylesheet.
             TODO: think about how to call the xsl_transformer url and move this test back to tests_unit.py """
         url = 'https://apps.library.brown.edu/iip/inscriptions/epidoc-files/abur0001.xml'
         r = requests.get( url )
@@ -37,6 +37,19 @@ class PrepperOtherTest(TestCase):
             # u'Κύριε' in unicode_doc,  # now appears w/vertical characters
             u'νούντων' in unicode_doc,
         )
+
+    def test_transform_bad_stylesheet_path(self):
+        """ Checks transform response with bad stylesheet.
+            TODO: think about how to call the xsl_transformer url and move this test back to tests_unit.py """
+        prepper.STYLESHEET_PATH = '/does/not/exist'
+        url = 'https://apps.library.brown.edu/iip/inscriptions/epidoc-files/abur0001.xml'
+        r = requests.get( url )
+        xml_utf8 = r.content
+        source_xml = xml_utf8.decode( 'utf-8' )
+        try:
+            unicode_doc = prepper.make_initial_solr_doc( source_xml )
+        except Exception as e:
+            self.assertTrue( 'No such file or directory' in unicode(e) )
 
     def test_call_git_pull(self):
         """ Checks for successful pull. """
