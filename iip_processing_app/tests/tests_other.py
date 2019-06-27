@@ -34,7 +34,8 @@ class PrepperOtherTest(TestCase):
         unicode_doc = prepper.make_initial_solr_doc( source_xml )
         self.assertEqual(
             True,
-            u'Κύριε' in unicode_doc,
+            # u'Κύριε' in unicode_doc,  # now appears w/vertical characters
+            u'νούντων' in unicode_doc,
         )
 
     def test_call_git_pull(self):
