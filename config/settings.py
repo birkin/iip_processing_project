@@ -105,6 +105,7 @@ STATIC_ROOT = os.environ['IIP_PRC__STATIC_ROOT']  # needed for collectstatic com
 
 
 # Email
+SERVER_EMAIL = 'iip_processor@library.brown.edu'
 EMAIL_HOST = os.environ['IIP_PRC__EMAIL_HOST']
 EMAIL_PORT = int( os.environ['IIP_PRC__EMAIL_PORT'] )
 
@@ -145,12 +146,22 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        }
     },
     'loggers': {
         'iip_processing_app': {
             'handlers': ['logfile'],
             'level': os.environ.get(u'IIP_PRC__LOG_LEVEL'),
             'propagate': False
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
         },
     }
 }
