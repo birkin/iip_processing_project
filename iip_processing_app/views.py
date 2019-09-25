@@ -3,12 +3,14 @@
 from __future__ import unicode_literals
 
 import datetime, json, logging, pprint
+
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from iip_processing_app.lib import version_helper
 from iip_processing_app.lib.github_helper import GHHelper, GHValidator
 from iip_processing_app.lib.orphan_helper import OrphanDeleter
 from iip_processing_app.lib.process_all_helper import AllProcessorHelper
@@ -121,6 +123,31 @@ def process_all( request ):
         resp = render( request, 'iip_processing_templates/process_all_response.html', context )
     log.debug( 'resp.__dict__, ```{}```'.format(pprint.pformat(resp.__dict__)) )
     return resp
+
+
+
+# ===========================
+# for development convenience
+# ===========================
+
+
+def version( request ):
+    """ Returns basic branch and commit data. """
+    rq_now = datetime.datetime.now()
+    commit = version_helper.get_commit()
+    branch = version_helper.get_branch()
+    info_txt = commit.replace( 'commit', branch )
+    context = version_helper.make_context( request, rq_now, info_txt )
+    output = json.dumps( context, sort_keys=True, indent=2 )
+    return HttpResponse( output, content_type='application/json; charset=utf-8' )
+
+
+def error_check( request ):
+    """ For checking that admins receive error-emails. """
+    if settings.DEBUG == True:
+        1/0
+    else:
+        return HttpResponseNotFound( '<div>404 / Not Found</div>' )
 
 
 ## EOF
