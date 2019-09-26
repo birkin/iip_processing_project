@@ -125,6 +125,17 @@ def process_all( request ):
     return resp
 
 
+def admin_options( request ):
+    """ Shows admin user-options.
+        Json for now, then web-page with buttons. """
+    data = {
+        'reindex_all': '%s://%s%s' % ( request.scheme, request.META.get('HTTP_HOST', '127.0.0.1'), reverse('process_all_url') ),
+        'view_processing': '%s://%s%s' % ( request.scheme, request.META.get('HTTP_HOST', '127.0.0.1'), reverse('view_processing_url') ),
+        'delete_solr_orphans': '%s://%s%s' % ( request.scheme, request.META.get('HTTP_HOST', '127.0.0.1'), reverse('delete_orphans_url') ),
+        }
+    resp = HttpResponse( json.dumps(data, sort_keys=True, indent=2), content_type='application/javascript; charset=utf-8' )
+    return resp
+
 
 # ===========================
 # for development convenience

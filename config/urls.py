@@ -12,13 +12,14 @@ admin.autodiscover()
 
 urlpatterns = [
 
+    url( r'^admin/options/', views.admin_options, name='admin_options_url' ),
     url( r'^admin/', include(admin.site.urls) ),
 
     url( r'^info/$', views.info, name='info_url' ),
 
     url( r'^gh_inscription_watcher/$', views.gh_inscription_watcher, name='gh_inscription_watcher_url' ),
 
-    url( r'^process_all/$', views.process_all, name=u'process_all_url' ),
+    url( r'^process_all/$', views.process_all, name='process_all_url' ),
 
     url( r'^delete_solr_orphans/process_deletions/$', views.process_solr_deletions, name='process_deletions_url' ),
     url( r'^delete_solr_orphans/$', views.delete_solr_orphans, name='delete_orphans_url' ),
