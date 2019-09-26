@@ -59,7 +59,8 @@ class PrepperOtherTest(TestCase):
         )
 
     def test_run_call_git_pull(self):
-        """ Triggers processing for processor.run_call_git_pull(); checks for no failed jobs. """
+        """ Triggers processing for processor.run_call_git_pull(); checks for no failed jobs.
+            Note, if running locally, may have to run `$ python ./iip_processing_app/lib/queue_utils/clear_job_queue.py` first. """
         ## confirm no processing jobs running
         q = rq.Queue( self.queue_name, connection=redis.Redis() )
         self.assertEqual( 0, len(q.jobs) )
