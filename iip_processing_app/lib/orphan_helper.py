@@ -25,6 +25,7 @@ class OrphanDeleter( object ):
         """ Validates admin request.
             Called by views.delete_solr_orphans(), and, weirdly, by process_all_helper.AllProcessorHelper.validate_request()
             TODO: merge into a common helper class/function. """
+        log.debug( 'eppn, `%s`' % eppn )
         validity = False
         if eppn in self.ADMINS:
             validity = True

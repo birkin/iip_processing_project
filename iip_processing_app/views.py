@@ -73,6 +73,7 @@ def delete_solr_orphans( request ):
     request.session['ids_to_delete'] = json.dumps( [] )
     resp = HttpResponseForbidden( '403 / Forbidden' )
     ( eppn, dev_user, host ) = ( request.META.get('Shibboleth-eppn', ''), request.GET.get('dev_auth_hack', ''), request.get_host() )
+    log.debug( 'eppn, `%s`' % eppn )
     if orphan_deleter.validate_delete_request( eppn, dev_user, host ):
         data = orphan_deleter.prep_data()
         request.session['ids_to_delete'] = json.dumps( data )
