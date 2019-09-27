@@ -26,7 +26,8 @@ class PrepperOtherTest(TestCase):
 
     def test_good_transform_xml(self):
         """ Checks transform with good source-xml and good-stylesheet.
-            TODO: think about how to call the xsl_transformer url and move this test back to tests_unit.py """
+            TODO: think about how to call the xsl_transformer url and move this test back to tests_unit.py
+            Note: if this test fails from localdev, check that the IP calling the stylesheet-transormer service is in the dev-server settings. """
         url = 'https://apps.library.brown.edu/iip/inscriptions/epidoc-files/abur0001.xml'
         r = requests.get( url )
         xml_utf8 = r.content
