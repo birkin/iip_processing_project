@@ -364,20 +364,39 @@ def run_update_process_tracker( to_process_dct ):
     return
 
 
+# def run_backup_statuses( files_to_update, files_to_remove ):
+#     """ Backs up statuses.
+#         Called by run_call_git_pull()
+#         Note: Files to remove will be enqueued first.
+#               This will properly handle a file that is removed, then re-added. """
+#     status_json = backupper.make_backup()
+#     for file_to_remove in files_to_remove:
+#         q.enqueue_call(
+#             func='iip_processing_app.lib.processor.run_remove_index_file',
+#             kwargs={'file_id': file_to_remove} )
+#     for file_to_update in files_to_update:
+#         q.enqueue_call(
+#             func='iip_processing_app.lib.processor.run_prep_file',
+#             kwargs={'file_id': file_to_update, 'status_json': status_json} )
+
+
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull()
         Note: Files to remove will be enqueued first.
               This will properly handle a file that is removed, then re-added. """
-    status_json = backupper.make_backup()
-    for file_to_remove in files_to_remove:
-        q.enqueue_call(
-            func='iip_processing_app.lib.processor.run_remove_index_file',
-            kwargs={'file_id': file_to_remove} )
-    for file_to_update in files_to_update:
-        q.enqueue_call(
-            func='iip_processing_app.lib.processor.run_prep_file',
-            kwargs={'file_id': file_to_update, 'status_json': status_json} )
+    try:
+        status_json = backupper.make_backup()
+        for file_to_remove in files_to_remove:
+            q.enqueue_call(
+                func='iip_processing_app.lib.processor.run_remove_index_file',
+                kwargs={'file_id': file_to_remove} )
+        for file_to_update in files_to_update:
+            q.enqueue_call(
+                func='iip_processing_app.lib.processor.run_prep_file',
+                kwargs={'file_id': file_to_update, 'status_json': status_json} )
+    except:
+        log.exception( 'problem making backup, or enqueuing files to remove, or enqueuing files to update... traceback follows; processing will continue' )
 
 
 def run_remove_index_file( file_id ):
