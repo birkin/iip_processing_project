@@ -394,11 +394,13 @@ def run_backup_statuses( files_to_update, files_to_remove ):
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_remove_index_file',
             kwargs={'file_id': file_to_remove} )
+    log.debug( 'all files_to_remove enqueued' )
     for file_to_update in files_to_update:
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_prep_file',
             kwargs={'file_id': file_to_update, 'status_json': status_json} )
-        # log.exception( 'problem making backup, or enqueuing files to remove, or enqueuing files to update... traceback follows; processing will continue' )
+    log.debug( 'all files_to_update enqueued' )
+    return
 
 
 def run_remove_index_file( file_id ):
