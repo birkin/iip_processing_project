@@ -84,7 +84,10 @@ class StatusBackupper( object ):
         response_dct = self.query_solr()
         status_dct = self.make_status_dct( response_dct )
         status_json = json.dumps( status_dct, sort_keys=True, indent=2 )
-        self.update_github( status_json )
+        try:
+            self.update_github( status_json )
+        except:
+            log.exception( 'problem updating github; traceback follows; processing will continue' )
         self.save_locally( status_json )
         self.delete_old_backups()
         return status_json
@@ -385,18 +388,17 @@ def run_backup_statuses( files_to_update, files_to_remove ):
         Called by run_call_git_pull()
         Note: Files to remove will be enqueued first.
               This will properly handle a file that is removed, then re-added. """
-    try:
-        status_json = backupper.make_backup()
-        for file_to_remove in files_to_remove:
-            q.enqueue_call(
-                func='iip_processing_app.lib.processor.run_remove_index_file',
-                kwargs={'file_id': file_to_remove} )
-        for file_to_update in files_to_update:
-            q.enqueue_call(
-                func='iip_processing_app.lib.processor.run_prep_file',
-                kwargs={'file_id': file_to_update, 'status_json': status_json} )
-    except:
-        log.exception( 'problem making backup, or enqueuing files to remove, or enqueuing files to update... traceback follows; processing will continue' )
+    log.debug( 'starting run_backup_statuses()' )
+    status_json = backupper.make_backup()
+    for file_to_remove in files_to_remove:
+        q.enqueue_call(
+            func='iip_processing_app.lib.processor.run_remove_index_file',
+            kwargs={'file_id': file_to_remove} )
+    for file_to_update in files_to_update:
+        q.enqueue_call(
+            func='iip_processing_app.lib.processor.run_prep_file',
+            kwargs={'file_id': file_to_update, 'status_json': status_json} )
+        # log.exception( 'problem making backup, or enqueuing files to remove, or enqueuing files to update... traceback follows; processing will continue' )
 
 
 def run_remove_index_file( file_id ):
