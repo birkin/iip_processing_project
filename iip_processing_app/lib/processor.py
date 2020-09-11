@@ -372,15 +372,19 @@ def run_update_process_tracker( to_process_dct ):
 #         Called by run_call_git_pull()
 #         Note: Files to remove will be enqueued first.
 #               This will properly handle a file that is removed, then re-added. """
+#     log.debug( 'starting run_backup_statuses()' )
 #     status_json = backupper.make_backup()
 #     for file_to_remove in files_to_remove:
 #         q.enqueue_call(
 #             func='iip_processing_app.lib.processor.run_remove_index_file',
 #             kwargs={'file_id': file_to_remove} )
+#     log.debug( 'all files_to_remove enqueued' )
 #     for file_to_update in files_to_update:
 #         q.enqueue_call(
 #             func='iip_processing_app.lib.processor.run_prep_file',
 #             kwargs={'file_id': file_to_update, 'status_json': status_json} )
+#     log.debug( 'all files_to_update enqueued' )
+#     return
 
 
 def run_backup_statuses( files_to_update, files_to_remove ):
@@ -389,7 +393,11 @@ def run_backup_statuses( files_to_update, files_to_remove ):
         Note: Files to remove will be enqueued first.
               This will properly handle a file that is removed, then re-added. """
     log.debug( 'starting run_backup_statuses()' )
-    status_json = backupper.make_backup()
+    try:
+        status_json = backupper.make_backup()
+        log.debug( 'status_json, ``%s``' % status_json )
+    except:
+        log.exception( 'problem making `status_json`' )
     for file_to_remove in files_to_remove:
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_remove_index_file',
