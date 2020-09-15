@@ -401,7 +401,7 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     log.debug( 'starting run_backup_statuses()' )
     try:
         status_json = backupper.make_backup()
-        log.debug( 'status_json, ``%s``' % status_json )
+        log.debug( 'original_status_json, ``%s``' % status_json )
         # log.debug( 'original status_json, ``%s``' % status_json )
         # temp_status_dct = json.loads( status_json )
         # temp_status_dct['statuses'] = { 'abur0001': 'approved' }
@@ -416,9 +416,16 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     log.debug( 'all files_to_remove enqueued' )
     for file_to_update in files_to_update:
         log.debug( 'processing file_to_update, ``%s``' % file_to_update )
+        """ Temporary hack-fix to prevent problem of big 'status_json' causing error. """
+        temp_status_dct = json.loads( status_json )
+        status = temp_status_dct['statuses'][file_to_update]
+        temp_status_dct['statuses'] = { file_to_update : status }
+        temp_status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
+        log.debug( 'updated status_json, ``%s``' % temp_status_json )
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_prep_file',
-            kwargs={'file_id': file_to_update, 'status_json': status_json} )
+            kwargs={'file_id': file_to_update, 'status_json': temp_status_json} )
+            # kwargs={'file_id': file_to_update, 'status_json': status_json} )
     log.debug( 'all files_to_update enqueued' )
     return
 
