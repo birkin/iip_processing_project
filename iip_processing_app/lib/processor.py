@@ -349,6 +349,7 @@ def run_call_git_pull( to_process_dct ):
     time.sleep( 2 )  # let any existing in-process pull finish
     puller.call_git_pull()
     if to_process_dct['files_updated'] or to_process_dct['files_removed']:
+        log.debug( 'about to enqueue job, passing in `to_process_dct`' )
         q.enqueue_call(
             func=u'iip_processing_app.lib.processor.run_update_process_tracker',
             kwargs={'to_process_dct': to_process_dct} )
@@ -373,13 +374,18 @@ def run_update_process_tracker( to_process_dct ):
 #         Note: Files to remove will be enqueued first.
 #               This will properly handle a file that is removed, then re-added. """
 #     log.debug( 'starting run_backup_statuses()' )
-#     status_json = backupper.make_backup()
+#     try:
+#         status_json = backupper.make_backup()
+#         log.debug( 'status_json, ``%s``' % status_json )
+#     except:
+#         log.exception( 'problem making `status_json`' )
 #     for file_to_remove in files_to_remove:
 #         q.enqueue_call(
 #             func='iip_processing_app.lib.processor.run_remove_index_file',
 #             kwargs={'file_id': file_to_remove} )
 #     log.debug( 'all files_to_remove enqueued' )
 #     for file_to_update in files_to_update:
+#         log.debug( 'processing file_to_update, ``%s``' % file_to_update )
 #         q.enqueue_call(
 #             func='iip_processing_app.lib.processor.run_prep_file',
 #             kwargs={'file_id': file_to_update, 'status_json': status_json} )
@@ -395,7 +401,11 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     log.debug( 'starting run_backup_statuses()' )
     try:
         status_json = backupper.make_backup()
-        log.debug( 'status_json, ``%s``' % status_json )
+        log.debug( 'original status_json, ``%s``' % status_json )
+        temp_status_dct = json.loads( status_json )
+        temp_status_dct['statuses'] = { 'abur0001': 'approved' }
+        status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
+        log.debug( 'updated status_json, ``%s``' % status_json )
     except:
         log.exception( 'problem making `status_json`' )
     for file_to_remove in files_to_remove:
@@ -404,12 +414,12 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             kwargs={'file_id': file_to_remove} )
     log.debug( 'all files_to_remove enqueued' )
     for file_to_update in files_to_update:
+        log.debug( 'processing file_to_update, ``%s``' % file_to_update )
         q.enqueue_call(
             func='iip_processing_app.lib.processor.run_prep_file',
             kwargs={'file_id': file_to_update, 'status_json': status_json} )
     log.debug( 'all files_to_update enqueued' )
     return
-
 
 def run_remove_index_file( file_id ):
     """ Removes file from index.
