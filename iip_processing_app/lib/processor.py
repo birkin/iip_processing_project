@@ -401,11 +401,12 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     log.debug( 'starting run_backup_statuses()' )
     try:
         status_json = backupper.make_backup()
-        log.debug( 'original status_json, ``%s``' % status_json )
-        temp_status_dct = json.loads( status_json )
-        temp_status_dct['statuses'] = { 'abur0001': 'approved' }
-        status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
-        log.debug( 'updated status_json, ``%s``' % status_json )
+        log.debug( 'status_json, ``%s``' % status_json )
+        # log.debug( 'original status_json, ``%s``' % status_json )
+        # temp_status_dct = json.loads( status_json )
+        # temp_status_dct['statuses'] = { 'abur0001': 'approved' }
+        # status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
+        # log.debug( 'updated status_json, ``%s``' % status_json )
     except:
         log.exception( 'problem making `status_json`' )
     for file_to_remove in files_to_remove:
