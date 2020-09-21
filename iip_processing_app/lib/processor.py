@@ -232,21 +232,6 @@ class Prepper( object ):
         log.debug( 'transformed_xml, ```{}```'.format(transformed_xml) )
         return transformed_xml
 
-    # def make_initial_solr_doc( self, source_xml ):
-    #     """ Returns result of xsl transform.
-    #         Called by make_solr_data() """
-    #     log.debug( 'stylesheet_path, ```{}```'.format(self.STYLESHEET_PATH) )
-    #     log.debug( 'transformer url, ```{}```'.format(self.TRANSFORMER_URL) )
-    #     with open( self.STYLESHEET_PATH ) as f:
-    #         stylesheet_utf8 = f.read()
-    #     stylesheet = stylesheet_utf8.decode( 'utf-8' )
-    #     payload = {
-    #         'xml': source_xml, 'xsl': stylesheet, 'auth_key': self.TRANSFORMER_AUTH_KEY }
-    #     r = requests.post( self.TRANSFORMER_URL, data=payload )
-    #     transformed_xml = r.content.decode( 'utf-8' )
-    #     log.debug( 'transformed_xml, ```{}```'.format(transformed_xml) )
-    #     return transformed_xml
-
     def update_status( self, display_status, initial_solr_xml ):
         """ Updates initial solr-xml with display-status.
             Called by make_solr_data() """
@@ -393,6 +378,43 @@ def run_update_process_tracker( to_process_dct ):
 #     return
 
 
+# def run_backup_statuses( files_to_update, files_to_remove ):
+#     """ Backs up statuses.
+#         Called by run_call_git_pull()
+#         Note: Files to remove will be enqueued first.
+#               This will properly handle a file that is removed, then re-added. """
+#     log.debug( 'starting run_backup_statuses()' )
+#     try:
+#         status_json = backupper.make_backup()
+#         log.debug( 'original_status_json, ``%s``' % status_json )
+#         # log.debug( 'original status_json, ``%s``' % status_json )
+#         # temp_status_dct = json.loads( status_json )
+#         # temp_status_dct['statuses'] = { 'abur0001': 'approved' }
+#         # status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
+#         # log.debug( 'updated status_json, ``%s``' % status_json )
+#     except:
+#         log.exception( 'problem making `status_json`' )
+#     for file_to_remove in files_to_remove:
+#         q.enqueue_call(
+#             func='iip_processing_app.lib.processor.run_remove_index_file',
+#             kwargs={'file_id': file_to_remove} )
+#     log.debug( 'all files_to_remove enqueued' )
+#     for file_to_update in files_to_update:
+#         log.debug( 'processing file_to_update, ``%s``' % file_to_update )
+#         """ Temporary hack-fix to prevent problem of big 'status_json' causing error. """
+#         temp_status_dct = json.loads( status_json )
+#         status = temp_status_dct['statuses'][file_to_update]
+#         temp_status_dct['statuses'] = { file_to_update : status }
+#         temp_status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
+#         log.debug( 'updated status_json, ``%s``' % temp_status_json )
+#         q.enqueue_call(
+#             func='iip_processing_app.lib.processor.run_prep_file',
+#             kwargs={'file_id': file_to_update, 'status_json': temp_status_json} )
+#             # kwargs={'file_id': file_to_update, 'status_json': status_json} )
+#     log.debug( 'all files_to_update enqueued' )
+#     return
+
+
 def run_backup_statuses( files_to_update, files_to_remove ):
     """ Backs up statuses.
         Called by run_call_git_pull()
@@ -400,13 +422,8 @@ def run_backup_statuses( files_to_update, files_to_remove ):
               This will properly handle a file that is removed, then re-added. """
     log.debug( 'starting run_backup_statuses()' )
     try:
-        status_json = backupper.make_backup()
+        status_json = backupper.make_backup()  # includes all statuses of all known files
         log.debug( 'original_status_json, ``%s``' % status_json )
-        # log.debug( 'original status_json, ``%s``' % status_json )
-        # temp_status_dct = json.loads( status_json )
-        # temp_status_dct['statuses'] = { 'abur0001': 'approved' }
-        # status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
-        # log.debug( 'updated status_json, ``%s``' % status_json )
     except:
         log.exception( 'problem making `status_json`' )
     for file_to_remove in files_to_remove:
@@ -416,9 +433,9 @@ def run_backup_statuses( files_to_update, files_to_remove ):
     log.debug( 'all files_to_remove enqueued' )
     for file_to_update in files_to_update:
         log.debug( 'processing file_to_update, ``%s``' % file_to_update )
-        """ Temporary hack-fix to prevent problem of big 'status_json' causing error. """
+        """ Hack-fix to prevent problem of big 'status_json' causing error. """
+        status = prepper.determine_display_status( file_to_update, status_json )  # normally called by Prepper.make_solr_data(), but I need it here because I'm sending a subset (only the relevant status) of all the statuses to the queue.
         temp_status_dct = json.loads( status_json )
-        status = temp_status_dct['statuses'][file_to_update]
         temp_status_dct['statuses'] = { file_to_update : status }
         temp_status_json = json.dumps( temp_status_dct, sort_keys=True, indent=2 )
         log.debug( 'updated status_json, ``%s``' % temp_status_json )
@@ -428,6 +445,7 @@ def run_backup_statuses( files_to_update, files_to_remove ):
             # kwargs={'file_id': file_to_update, 'status_json': status_json} )
     log.debug( 'all files_to_update enqueued' )
     return
+
 
 def run_remove_index_file( file_id ):
     """ Removes file from index.
